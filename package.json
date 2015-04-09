@@ -1,0 +1,12 @@
+{
+  "name": "testyo ",
+  "version": "0.0.0",
+  "dependencies": {
+    "chalk": "latest",
+    "lodash": "latest",
+    "mkdirp": "latest",
+    "mocha": "latest",
+    "yeoman-generator": "latest",
+    "yosay": "latest"
+   }
+}
