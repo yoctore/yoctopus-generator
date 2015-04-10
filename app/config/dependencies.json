@@ -1,40 +1,12 @@
 {
   "dependencies": [
     {"name": "async"},
-    {"name": "body-parser"},
-    {"name": "bower"},
-    {"name": "compression"},
-    {"name": "connect"},
-    {"name": "connect-flash"},
-    {"name": "connect-multiparty"},
-    {"name": "cookie-parser"},
-    {"name": "crypto-js"},
-    {"name": "dateformat"},
-    {"name": "debug"},
-    {"name": "express"},
-    {"name": "express-less"},
-    {"name": "express-session"},
-    {"name": "fs-extra"},
-    {"name": "glob"},
-    {"name": "glob-all"},
-    {"name": "gm", "confirm" : "true"},
-    {"name": "jade"},
-    {"name": "lodash"},
-    {"name": "method-override"},
-    {"name": "morgan"},
-    {"name": "mv"},
-    {"name": "nodemailer", "confirm" : "true"},
-    {"name": "nodemailer-smtp-pool", "confirm" : "true"},
-    {"name": "passport"},
-    {"name": "passport-local"},
-    {"name": "portscanner"},
-    {"name": "prerender-node", "confirm" : "true"},
-    {"name": "qs"},
-    {"name": "serve-favicon"},
-    {"name": "uuid"},
-    {"name": "vhost"},
-    {"name": "view-helpers"},
-    {"name": "winston"}
-    ]
+    {"name": "body-parser"}
+    ],
 
+    "db": [
+        {"type":"mysql", "dependencies":[ {"name":"mysql","version":"2.5.2"},"sequelize"]},
+        {"type":"postgresql", "dependencies":[ "node-postgres"]},
+        {"type":"mongoDB", "dependencies":[ "mongodb"]}
+    ]
 }

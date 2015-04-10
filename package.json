@@ -1,5 +1,5 @@
 {
-  "name": "testyo ",
+  "name": "generator-yocto-stack",
   "version": "0.0.0",
   "dependencies": {
     "chalk": "latest",
