@@ -1,12 +1,13 @@
 {
-  "name": "generator-yocto-stack",
+  "name": "yocto-stack-generator",
   "version": "0.0.0",
   "dependencies": {
     "chalk": "latest",
     "lodash": "latest",
     "mkdirp": "latest",
     "mocha": "latest",
+    "winston": "^1.0.0",
     "yeoman-generator": "latest",
     "yosay": "latest"
-   }
+  }
 }
