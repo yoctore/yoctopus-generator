@@ -1,0 +1,7 @@
+.DS_Store
+.editorconfig
+.jshintrc
+.travis.yml
+.yo-rc.json
+README_old.md
+node_modules/
