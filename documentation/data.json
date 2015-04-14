@@ -1,0 +1,269 @@
+{
+    "project": {},
+    "files": {
+        "app/index.js": {
+            "name": "app/index.js",
+            "modules": {
+                "mainModuleYoctoStackGenerator": 1,
+                "initializing": 1,
+                "prompting": 1,
+                "configuring": 1,
+                "writing": 1,
+                "install": 1
+            },
+            "classes": {
+                "Main": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "mainModuleYoctoStackGenerator": {
+            "name": "mainModuleYoctoStackGenerator",
+            "submodules": {
+                "initializing": 1,
+                "prompting": 1,
+                "configuring": 1,
+                "writing": 1,
+                "install": 1
+            },
+            "classes": {
+                "Main": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "app/index.js",
+            "line": 1,
+            "description": "We extend a parent generator of yeoman to create our own generator",
+            "itemtype": "main"
+        },
+        "initializing": {
+            "name": "initializing",
+            "submodules": {},
+            "classes": {},
+            "fors": {},
+            "is_submodule": 1,
+            "namespaces": {},
+            "module": "mainModuleYoctoStackGenerator",
+            "namespace": "",
+            "file": "app/index.js",
+            "line": 36,
+            "description": "Initializing, load .json config files"
+        },
+        "prompting": {
+            "name": "prompting",
+            "submodules": {},
+            "classes": {},
+            "fors": {},
+            "is_submodule": 1,
+            "namespaces": {},
+            "module": "mainModuleYoctoStackGenerator",
+            "namespace": "",
+            "file": "app/index.js",
+            "line": 94,
+            "description": "Handle user intereactions"
+        },
+        "configuring": {
+            "name": "configuring",
+            "submodules": {},
+            "classes": {},
+            "fors": {},
+            "is_submodule": 1,
+            "namespaces": {},
+            "module": "mainModuleYoctoStackGenerator",
+            "namespace": "",
+            "file": "app/index.js",
+            "line": 208,
+            "description": "Handle configuration : make all directory ..."
+        },
+        "writing": {
+            "name": "writing",
+            "submodules": {},
+            "classes": {},
+            "fors": {},
+            "is_submodule": 1,
+            "namespaces": {},
+            "module": "mainModuleYoctoStackGenerator",
+            "namespace": "",
+            "file": "app/index.js",
+            "line": 247,
+            "description": "Generate specifics files : package.json, routes..."
+        },
+        "install": {
+            "name": "install",
+            "submodules": {},
+            "classes": {
+                "Main": 1
+            },
+            "fors": {},
+            "is_submodule": 1,
+            "namespaces": {},
+            "module": "mainModuleYoctoStackGenerator",
+            "namespace": "",
+            "file": "app/index.js",
+            "line": 1,
+            "description": "Install all dependencies : npm and Bower"
+        }
+    },
+    "classes": {
+        "Main": {
+            "name": "Main",
+            "shortname": "Main",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "mainModuleYoctoStackGenerator",
+            "file": "app/index.js",
+            "line": 1,
+            "description": "Main file of the 'yocto-stack-generator'",
+            "date": "14/04/2015",
+            "author": "Cédric Balard",
+            "copyright": "Yocto SAS <http://www.yocto>",
+            "submodule": "install"
+        }
+    },
+    "classitems": [
+        {
+            "file": "app/index.js",
+            "line": 42,
+            "description": "Read \"./config/folders.json\" and get all folders",
+            "itemtype": "method",
+            "name": "getPathFoldrers",
+            "params": [],
+            "return": {
+                "description": ""
+            },
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "initializing"
+        },
+        {
+            "file": "app/index.js",
+            "line": 54,
+            "description": "Read \"dependencies.json\" and get all dependencies",
+            "itemtype": "method",
+            "name": "getNpmDependencies",
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "initializing"
+        },
+        {
+            "file": "app/index.js",
+            "line": 65,
+            "description": "Read \"dependencies.json\" and get all optional dependencies",
+            "itemtype": "method",
+            "name": "getNpmDependenciesOptional",
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "initializing"
+        },
+        {
+            "file": "app/index.js",
+            "line": 81,
+            "description": "Read \"dependencies.json\" and get different type of DB",
+            "itemtype": "method",
+            "name": "getDBConfig",
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "initializing"
+        },
+        {
+            "file": "app/index.js",
+            "line": 100,
+            "description": "Ask user about general project's info :\n\t\t- Name\n\t\t- Description\n\t\t- Version\n\t\t- If is private",
+            "itemtype": "method",
+            "name": "promptInfoProject",
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "prompting"
+        },
+        {
+            "file": "app/index.js",
+            "line": 162,
+            "description": "Ask user about wich npm dependencie optional he want install",
+            "itemtype": "method",
+            "name": "promptNpmDependenciesOptional",
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "prompting"
+        },
+        {
+            "file": "app/index.js",
+            "line": 187,
+            "description": "Ask user about wich type of database he want install",
+            "itemtype": "method",
+            "name": "promptDbChoices",
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "prompting"
+        },
+        {
+            "file": "app/index.js",
+            "line": 214,
+            "description": "Create all folders present in \"config/folders.json\"\nAdd '.gitignore' file in each created folder",
+            "itemtype": "method",
+            "name": "scaffoldFolders",
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "configuring"
+        },
+        {
+            "file": "app/index.js",
+            "line": 229,
+            "description": "Handle DB dependencies in correlation with the dbType choosen\nAdd specifics dependencies to install",
+            "itemtype": "method",
+            "name": "setDependenciesDB",
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "configuring"
+        },
+        {
+            "file": "app/index.js",
+            "line": 253,
+            "description": "Generate files :\n\t - gruntfile.js\n\t - package.json",
+            "itemtype": "method",
+            "name": "generateAllFiles",
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "writing"
+        },
+        {
+            "file": "app/index.js",
+            "line": 279,
+            "description": "Install all npm dependencies",
+            "itemtype": "method",
+            "name": "installNpmDependencies",
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "install"
+        },
+        {
+            "file": "app/index.js",
+            "line": 300,
+            "description": "Install all bower dependencies",
+            "itemtype": "method",
+            "name": "installBowerDependencies",
+            "class": "Main",
+            "module": "mainModuleYoctoStackGenerator",
+            "submodule": "install"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "unknown tag: date",
+            "line": " app/index.js:1"
+        },
+        {
+            "message": "unknown tag: copyright",
+            "line": " app/index.js:1"
+        },
+        {
+            "message": "param name/type/descript missing",
+            "line": " app/index.js:42"
+        }
+    ]
+}

@@ -212,15 +212,18 @@ module.exports = yeoman.generators.Base.extend({
      */
     configuring : {
         /**
-         * create all folders present in "config/folders.json"
+         * Create all folders present in "config/folders.json"
+         * Add '.gitignore' file in each created folder
          *
          * @method scaffoldFolders
          */
         scaffoldFolders : function() {
             _.forEach( this.pathFolders.folders, function(value) {
                 mkdirp(value.path);
-                logger.info( _(['New folder created :', value.path]).join(" ") );
-            });
+                logger.info( _(['New folder created :', value.path]).join(' ') );
+                this.copy('_.gitignore', _([value.path,'.gitignore']).join('/') );
+
+            }, this);
         },
 
         /**
