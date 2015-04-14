@@ -1,13 +1,21 @@
 {
-  "name": "yocto-stack-generator",
-  "version": "0.0.0",
-  "dependencies": {
-    "chalk": "latest",
-    "lodash": "latest",
-    "mkdirp": "latest",
-    "mocha": "latest",
-    "winston": "^1.0.0",
-    "yeoman-generator": "latest",
-    "yosay": "latest"
+  "name"        : "generator-yocto-stack",
+  "description" : "",
+  "version"     : "0.1.0",
+  "scripts"     : {
+    "clean"       : "rm -rf node_modules && rm -rf bower_components",
+    "preset"      : "npm install -g yo",
+    "launch"      : "yo",
+    "postset"     : "npm link",
+    "generate"    : "npm run clean && npm run preset && npm install && npm run postset && npm run launch"
+  },
+  "dependencies"  : {
+    "chalk"             : "latest",
+    "lodash"            : "latest",
+    "mkdirp"            : "latest",
+    "mocha"             : "latest",
+    "winston"           : "^1.0.0",
+    "yeoman-generator"  : "latest",
+    "yosay"             : "latest"
   }
 }
