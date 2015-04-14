@@ -1,6 +1,29 @@
 {
-  "name": "yocto-stack-generator",
-  "version": "0.0.0",
+  "name": "generator-yocto-stack",
+  "version": "1.0.1",
+  "description":" The Yocto Stack Generator is the component that permit you to install the Yocto Stack easily.",
+  "scripts"     : {
+      "clean"       : "rm -rf node_modules && rm -rf bower_components",
+      "preset"      : "npm install -g yo",
+      "postset"     : "npm link",
+      "generate"    : "npm run clean && npm run preset && npm install && npm run postset"
+    },
+    "homepage": "http://yocto.re",
+    "author": {
+      "name": "The Yocto Team"
+    },
+    "repository": {
+      "type": "git",
+      "url": "http://lab.yocto.digital/yocto-tools/yocto-stack-generator"
+    },
+    "engines": {
+      "node": ">=0.12.2"
+    },
+    "files": [
+      "index.js",
+      "out",
+      "app"
+    ],
   "dependencies": {
     "chalk": "latest",
     "lodash": "latest",

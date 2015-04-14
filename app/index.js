@@ -1,28 +1,50 @@
 /**
  * Main file of the 'yocto-stack-generator'
  *
+ * @class Main
+ * @date 14/04/2015
  * @author Cédric Balard
+ * @copyright Yocto SAS <http://www.yocto>
  */
 
 'use strict';
 var yeoman  = require('yeoman-generator');
 var mkdirp  = require('mkdirp');
 var _       = require('lodash');
-var logger  = require('winston');
+var winston  = require('winston');
+
+
+ var logger = new (winston.Logger)( {
+    transports: [
+      new (winston.transports.Console)( {
+          colorize : true
+          }),
+      ]
+  });
 
 var npmDependenciesFile = require('./config/dependencies.json');
 logger.info('List of Npm Dependencies : loaded ');
 
-
-
-module.exports= yeoman.generators.Base.extend({
+/**
+ *We extend a parent generator of yeoman to create our own generator
+ *
+ * @module mainModuleYoctoStackGenerator
+ * @main
+ */
+module.exports = yeoman.generators.Base.extend({
 
     /**
      * Initializing, load .json config files
+     *
+     * @submodule initializing
      */
     initializing : {
         /**
          * Read "./config/folders.json" and get all folders
+         *
+         * @method getPathFoldrers
+         * @param
+         * @return
          */
         getPathFoldrers : function() {
             this.pathFolders = require('./config/folders.json');
@@ -31,8 +53,9 @@ module.exports= yeoman.generators.Base.extend({
 
         /**
          * Read "dependencies.json" and get all dependencies
+         * @method getNpmDependencies
          */
-        getNpmDepencies : function() {
+        getNpmDependencies : function() {
             this.listNpmDependencies = [];
             _.forEach( npmDependenciesFile.required, function(dep) {
                 this.listNpmDependencies.push(dep.dependencies);
@@ -41,8 +64,10 @@ module.exports= yeoman.generators.Base.extend({
 
         /**
          * Read "dependencies.json" and get all optional dependencies
+         *
+         * @method getNpmDependenciesOptional
          */
-        getNpmDepenciesOptional : function() {
+        getNpmDependenciesOptional : function() {
             this.listNpmDependenciesOptional = [];
             _.forEach( npmDependenciesFile.optional, function(dep) {
                 if (_.isString(dep.dependencies) )
@@ -54,7 +79,9 @@ module.exports= yeoman.generators.Base.extend({
         },
 
         /**
-         * Get different type of DB
+         * Read "dependencies.json" and get different type of DB
+         *
+         * @method getDBConfig
          */
         getDBConfig : function() {
             this.dbConfigPossibles = [];
@@ -66,10 +93,18 @@ module.exports= yeoman.generators.Base.extend({
 
     /**
      * Handle user intereactions
+     *
+     * @submodule prompting
      */
-    prompting: {
+    prompting : {
         /**
-         * Ask user about general project's info
+         * Ask user about general project's info :
+         * 		- Name
+         * 		- Description
+         * 		- Version
+         * 		- If is private
+         *
+         * @method promptInfoProject
          */
         promptInfoProject : function() {
             var done = this.async();
@@ -77,10 +112,10 @@ module.exports= yeoman.generators.Base.extend({
                 name        : 'appName',
                 message     : 'What is your app\'s name ?',
                 validate    : function(input){
-                    if( _.isEmpty(input) )
-                        return false;
-                    else
+                    if( input.length >2 )
                         return true;
+                    else
+                        return 'Please enter a valid application name (Min 3 Chars)';
                 }
             },
 
@@ -88,10 +123,10 @@ module.exports= yeoman.generators.Base.extend({
                 name        : 'appDescription',
                 message     : 'What is your app\'s desription ?',
                 validate    : function(input) {
-                    if( _.isEmpty(input) )
-                        return false;
-                    else
+                    if( input.length >9 )
                         return true;
+                    else
+                        return 'Please enter a valid application description (Min 10 Chars)';
                 }
             },
 
@@ -100,7 +135,7 @@ module.exports= yeoman.generators.Base.extend({
                 message     : 'What is your app\'s version (format x.x.x) ?',
                 default     : '1.0.1',
                 validate    : function(input) {
-                    var reg = /^(?:(\d+)\.)?(?:(\d+)\.)?(\d+)$/;
+                    var reg = /^(\d+)\.(\d+)\.(\d+)$/;
                     if( reg.exec(input))
                         return true;
                     else
@@ -116,19 +151,20 @@ module.exports= yeoman.generators.Base.extend({
             }];
 
             this.prompt(prompts, function (props) {
-                this.appName = props.appName;
+                this.appName        = props.appName;
                 this.appDescription = props.appDescription;
-                this.appVersion = props.appVersion;
-                this.appIsPrivate = props.appIsPrivate;
+                this.appVersion     = props.appVersion;
+                this.appIsPrivate   = props.appIsPrivate;
                 done();
             }.bind(this));
         },
 
         /**
          * Ask user about wich npm dependencie optional he want install
+         *
+         * @method promptNpmDependenciesOptional
          */
-        promptNpmDependenciesOptional: function()
-        {
+        promptNpmDependenciesOptional : function() {
             if( ! _.isEmpty(this.listNpmDependenciesOptional) )
             {
                 var done = this.async();
@@ -150,9 +186,10 @@ module.exports= yeoman.generators.Base.extend({
 
         /**
         * Ask user about wich type of database he want install
+        *
+        * @method promptDbChoices
          */
-        promptDbChoices: function()
-        {
+        promptDbChoices : function() {
             var done = this.async();
             var prompts = [{
                 type    : 'list',
@@ -170,14 +207,17 @@ module.exports= yeoman.generators.Base.extend({
 
     /**
      * Handle configuration : make all directory ...
+     *
+     * @submodule configuring
      */
-    configuring: {
+    configuring : {
         /**
          * create all folders present in "config/folders.json"
+         *
+         * @method scaffoldFolders
          */
-        scaffoldFolders: function(){
-            _.forEach( this.pathFolders.folders, function(value)
-            {
+        scaffoldFolders : function() {
+            _.forEach( this.pathFolders.folders, function(value) {
                 mkdirp(value.path);
                 logger.info( _(['New folder created :', value.path]).join(" ") );
             });
@@ -186,12 +226,14 @@ module.exports= yeoman.generators.Base.extend({
         /**
          * Handle DB dependencies in correlation with the dbType choosen
          * Add specifics dependencies to install
+         *
+         * @method setDependenciesDB
          */
         setDependenciesDB : function() {
             _.forEach( npmDependenciesFile.db, function(db) {
                 if(this.dbType === db.type )
                 {
-                    _.forEach(db.dependencies, function(dep){
+                    _.forEach(db.dependencies, function(dep) {
                         this.listNpmDependencies.push(dep);
                     } ,this )   ;
                 }
@@ -201,9 +243,18 @@ module.exports= yeoman.generators.Base.extend({
 
     /**
      * Generate specifics files : package.json, routes...
+     *
+     * @submodule writing
      */
     writing : {
-        copyMainFile : function() {
+        /**
+         *Generate files :
+         *	 - gruntfile.js
+         *	 - package.json
+         *
+         * @method generateAllFiles
+         */
+        generateAllFiles : function() {
             var context = {
                 siteName            : this.appName,
                 siteDescription     : this.appDescription,
@@ -218,15 +269,18 @@ module.exports= yeoman.generators.Base.extend({
 
     /**
      * Install all dependencies : npm and Bower
+     *
+     * @submodule install
      */
-    install:{
+    install : {
         /**
          * Install all npm dependencies
+         *
+         * @method installNpmDependencies
          */
-        installNpmDependencies: function() {
+        installNpmDependencies : function() {
             this.log('Install npm dependencies');
-            _.forEach(this.listNpmDependencies, function(dep)
-            {
+            _.forEach(this.listNpmDependencies, function(dep) {
                 if (_.isString(dep))
                 {
                     this.npmInstall([dep], { 'save': true });
@@ -239,7 +293,13 @@ module.exports= yeoman.generators.Base.extend({
                 }
             }, this);
         },
-        installBowerDependencies: function(){
+
+        /**
+         * Install all bower dependencies
+         *
+         * @method installBowerDependencies
+         */
+        installBowerDependencies : function() {
         }
     }
 });
