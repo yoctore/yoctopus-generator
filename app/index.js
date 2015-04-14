@@ -133,7 +133,7 @@ module.exports = yeoman.generators.Base.extend({
             {
                 name        : 'appVersion',
                 message     : 'What is your app\'s version (format x.x.x) ?',
-                default     : '1.0.1',
+                default     : '0.1.0',
                 validate    : function(input) {
                     var reg = /^(\d+)\.(\d+)\.(\d+)$/;
                     if( reg.exec(input))
