@@ -1,19 +1,43 @@
 {
-  "required": [
-    {"dependencies": "async"},
-    {"dependencies": "body-parser"},
-    {"dependencies":{"name":"cookie-parser","version":"1.3.3"} }
+    "required": [
+        { "dependencies" : "async" },
+        { "dependencies" : "body-parser" },
+        { "dependencies" : {
+            "name"      : "cookie-parser",
+            "version"   : "1.3.3"
+            }
+        }
     ],
 
     "optional": [
-      {"dependencies": "nodemailer"},
-      {"dependencies": "nodemailer-smtp-pool"},
-      {"dependencies": {"name":"express","version":"4.9.0"} }
-      ],
+        { "dependencies" : "nodemailer" },
+        { "dependencies" : "nodemailer-smtp-pool" },
+        { "dependencies" : {
+            "name"      : "express",
+            "version"   : "4.9.0"
+            }
+        }
+    ],
 
     "db": [
-        {"type":"mysql", "dependencies":[ {"name":"mysql","version":"2.5.2"},"sequelize"]},
-        {"type":"postgresql", "dependencies":[ "node-postgres"]},
-        {"type":"mongoDB", "dependencies":[ "mongodb"]}
+        { "type"            : "mysql",
+          "dependencies"    : [
+                { "name"      : "mysql",
+                  "version"   : "2.5.2"
+                },
+                "sequelize"
+          ]
+        },
+
+        { "type"         : "postgresql",
+          "dependencies" : [
+              "node-postgres"
+          ]
+        },
+        { "type"         : "mongoDB",
+          "dependencies" : [
+              "mongodb"
+          ]
+        }
     ]
 }
