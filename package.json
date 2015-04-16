@@ -4,7 +4,7 @@
   "description" :" The Yocto Stack Generator is the component that permit you to install the Yocto Stack easily.",
   "scripts"     : {
       "clean"       : "npm cache clean && rm -rf node_modules && rm -rf bower_components",
-      "preset"      : "npm install -g yo",
+      "preset"      : "npm install -g yo && npm unlink",
       "postset"     : "npm link",
       "generate"    : "npm run clean && npm run preset && npm install && npm run postset && npm cache clean"
     },

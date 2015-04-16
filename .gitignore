@@ -5,3 +5,4 @@ README_old.md
 .jshintrc
 .yo-rc.json
 .travis.yml
+npm-debug.log
