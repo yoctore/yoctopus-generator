@@ -1,36 +1,51 @@
 {
-  "name"        : "generator-run-yocto-stack-generator",
-  "version"     : "0.1.0",
-  "description" :" The Yocto Stack Generator is the component that permit you to install the Yocto Stack easily.",
-  "scripts"     : {
-      "clean"       : "npm cache clean && rm -rf node_modules && rm -rf bower_components",
-      "preset"      : "npm install -g yo && npm unlink",
-      "postset"     : "npm link",
-      "generate"    : "npm run clean && npm run preset && npm install && npm run postset && npm cache clean"
-    },
-    "homepage": "http://yocto.re",
-    "author" : {
-      "name" : "The Yocto Team"
-    },
-    "repository" : {
-      "type"     : "git",
-      "url"      : "http://lab.yocto.digital/yocto-tools/yocto-stack-generator"
-    },
-    "engines" : {
-      "node"  : ">=0.12.2"
-    },
-    "files" : [
-      "index.js",
-      "documentation",
-      "app"
-    ],
-  "dependencies" : {
-    "chalk"             : "latest",
-    "lodash"            : "latest",
-    "mkdirp"            : "latest",
-    "mocha"             : "latest",
-    "winston"           : "^1.0.0",
-    "yeoman-generator"  : "latest",
-    "yosay"             : "latest"
+  "name": "generator-run-yocto-stack-generator",
+  "version": "0.1.0",
+  "description": " The Yocto Stack Generator is the component that permit you to install the Yocto Stack easily.",
+  "scripts": {
+    "clean": "npm cache clean && rm -rf node_modules && rm -rf bower_components",
+    "preset": "npm install -g yo && npm unlink",
+    "postset": "npm link",
+    "generate": "npm run clean && npm run preset && npm install && npm run postset && npm cache clean"
+  },
+  "homepage": "http://yocto.re",
+  "author": {
+    "name": "The Yocto Team"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://lab.yocto.digital/yocto-tools/yocto-stack-generator"
+  },
+  "engines": {
+    "node": ">=0.12.2"
+  },
+  "files": [
+    "index.js",
+    "documentation",
+    "app"
+  ],
+  "dependencies": {
+    "chalk": "^1.1.1",
+    "is-url": "^1.2.1",
+    "isemail": "^1.2.0",
+    "lodash": "^3.10.1",
+    "mkdirp": "latest",
+    "mocha": "latest",
+    "n-api": "^1.2.43",
+    "request": "^2.65.0",
+    "rmdir": "^1.1.0",
+    "spdx": "^0.4.1",
+    "winston": "^1.0.0",
+    "yeoman-generator": "latest",
+    "yocto-logger": "^1.1.0",
+    "yosay": "latest"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.11.3",
+    "grunt-contrib-uglify": "^0.10.0",
+    "grunt-jscs": "^2.2.0",
+    "grunt-mocha-cli": "^2.0.0",
+    "yocto-hint": "^1.1.6"
   }
 }

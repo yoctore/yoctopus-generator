@@ -1,8 +1,0 @@
-{
-  "name": "<%= siteName %>",
-  "description": "<%= siteDescription %>",
-  "version": "<%= siteVersion %>",
-  "private": "<%= siteIsPrivate %>",
-  "dependencies": {
-  }
-}

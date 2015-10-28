@@ -1,308 +1,249 @@
-/**
- * Main file of the 'yocto-stack-generator'
- *
- * @class Main
- * @date 14/04/2015
- * @author Cédric Balard
- * @copyright Yocto SAS <http://www.yocto>
- */
-
 'use strict';
-var yeoman  = require('yeoman-generator');
-var mkdirp  = require('mkdirp');
-var _       = require('lodash');
-var winston  = require('winston');
 
-
- var logger = new (winston.Logger)( {
-    transports: [
-      new (winston.transports.Console)( {
-          colorize : true
-          }),
-      ]
-  });
-
-var npmDependenciesFile = require('./config/dependencies.json');
-logger.info('List of Npm Dependencies : loaded ');
+var generators  = require('yeoman-generator');
+var mkdirp      = require('mkdirp');
+var _           = require('lodash');
+var n           = require('n-api');
+var request     = require('request');
+var chalk       = require('chalk');
+var logger      = require('yocto-logger');
 
 /**
- *We extend a parent generator of yeoman to create our own generator
- *
- * @module mainModuleYoctoStackGenerator
- * @main
+ * Default export
  */
-module.exports = yeoman.generators.Base.extend({
+module.exports = generators.Base.extend({
+  /**
+   * Default constructor
+   */
+  constructor   :  function () {
+    // Calling the super constructor is important so our generator is correctly set up
+    generators.Base.apply(this, arguments);
 
     /**
-     * Initializing, load .json config files
+     * Default internal config
      *
-     * @submodule initializing
+     * @property {Object}
      */
-    initializing : {
-        /**
-         * Read "./config/folders.json" and get all folders
-         *
-         * @method getPathFoldrers
-         * @param
-         * @return
-         */
-        getPathFoldrers : function() {
-            this.pathFolders = require('./config/folders.json');
-            logger.info('Folders list to create : loaded ');
-        },
+    this.cfg = {
+      angular     : {
+        url         : 'https://code.angularjs.org/',
+        resolution  : 'latest',
+        versions    : [ 'latest' ]
+      },
+      name        : 'Yocto Stack generator',
+      nVersions   : n.ls(),
+      debug       : true,
+      paths       : {
+        dependencies  : './config/dependencies.json',
+        folders       : './config/folders.json'
+      },
+      generate    : {
+        node    : false,
+        angular : false 
+      }
+    };
 
-        /**
-         * Read "dependencies.json" and get all dependencies
-         * @method getNpmDependencies
-         */
-        getNpmDependencies : function() {
-            this.listNpmDependencies = [];
-            _.forEach( npmDependenciesFile.required, function(dep) {
-                this.listNpmDependencies.push(dep.dependencies);
-            }, this );
-        },
+    /**
+     * Default ascii method to display content to ascii
+     *
+     * @param {String} name ascii name to get
+     * @param {Boolean} exit if true en current program
+     */
+    this.asciiMessage = function (name, exit) {
+      // normalize exit process
+      exit = _.isBoolean(exit) ? exit : false;
+      // TODO here
 
-        /**
-         * Read "dependencies.json" and get all optional dependencies
-         *
-         * @method getNpmDependenciesOptional
-         */
-        getNpmDependenciesOptional : function() {
-            this.listNpmDependenciesOptional = [];
-            _.forEach( npmDependenciesFile.optional, function(dep) {
-                if (_.isString(dep.dependencies) )
-                    this.listNpmDependenciesOptional.push( dep.dependencies);
-                else
-                    this.listNpmDependenciesOptional.push(  _([dep.dependencies.name, dep.dependencies.version]).join("@"));
+      // exit ?
+      if (exit) {
+        process.exit(0);
+      }
+    };
+    /**
+     * Utility method to normalize given
+     *
+     * @param {String} path current path to use
+     * @return {String} generated path
+     */
+    this.normalizePath = function (path) {
+      // default statement
+      return path.normalize([ process.cwd(), path ].join('/'));
+    };
 
-            }, this );
-        },
+    /**
+     * Utility method to prefix path for debug mode
+     *
+     * @param {String} path current path to use
+     * @return {String} generated path
+     */
+    this.prefixPath = function (path) {
+      // is debug ?
+      if (this.cfg.debug) {
+        // normalize process
+        return this.normalizePath([ 'example', path ].join('/'));
+      }
+      // default statement
+      return path;
+    };
 
-        /**
-         * Read "dependencies.json" and get different type of DB
-         *
-         * @method getDBConfig
-         */
-        getDBConfig : function() {
-            this.dbConfigPossibles = [];
-            _.forEach( npmDependenciesFile.db, function(db) {
-                this.dbConfigPossibles.push(db.type);
-            }, this );
+    /**
+     * Default utility method to display a banner message
+     *
+     * @param {String} message message to display
+     */
+    this.banner = function (message) {
+      // process banner
+      logger.banner([ '[', this.cfg.name, '] -', message ].join(' '));
+    };
+    /**
+     * Default utility method to log message on generator
+     *
+     * @param {String} color default color to use for logging
+     * @param {String} message message to display
+     */
+    this.logger =  function (color, message) {
+      // normalize color
+      color = _.isString(color) && !_.isEmpty(color) ? color : 'green';
+      // default process
+      this.log([ chalk[color]('>>'), message ].join(' '));
+    };
+    /**
+     * Default utility method for error message
+     *
+     * @param {String} message message to display
+     */
+    this.error  = function (message) {
+      // default proess
+      this.logger('red', message);
+    };
+
+    /**
+     * Default utility method for warning message
+     *
+     * @param {String} message message to display
+     */
+    this.warning  = function (message) {
+      // default proess
+      this.logger('yellow', message);
+    };
+
+    /**
+     * Default utility method for warning message
+     *
+     * @param {String} message message to display
+     */
+    this.info  = function (message) {
+      // default proess
+      this.logger('green', message);
+    };
+  },
+  /**
+   * Initializing part
+   */
+  initializing  : {
+    /**
+     * Default banner
+     */
+    welcome   : function () {
+      // process welcome message
+      this.asciiMessage('welcome');
+    },
+    /**
+     * Default Ready function
+     */
+    ready             : function () {
+      // create an async process
+      var done = this.async();
+
+      // prompt message
+      this.prompt([ {
+        name    : 'ready',
+        message : 'This process will take ~5 minutes. Are your ready ?',
+        type    : 'confirm'
+      }], function (props) {
+        if (props.ready) {
+          done();
+        } else {
+          // process coffee message
+          this.asciiMessage('wait-coffee', true);
         }
+
+      }.bind(this));
     },
 
     /**
-     * Handle user intereactions
-     *
-     * @submodule prompting
+     * Retreive here dependencies / folders and angular versions
      */
-    prompting : {
-        /**
-         * Ask user about general project's info :
-         * 		- Name
-         * 		- Description
-         * 		- Version
-         * 		- If is private
-         *
-         * @method promptInfoProject
-         */
-        promptInfoProject : function() {
-            var done = this.async();
-            var prompts = [{
-                name        : 'appName',
-                message     : 'What is your app\'s name ?',
-                validate    : function(input){
-                    if( input.length >2 )
-                        return true;
-                    else
-                        return 'Please enter a valid application name (Min 3 Chars)';
-                }
-            },
+    init : function () {
+      // default banner
+      this.banner('We are initializing some data. Take a cofee and wait a few moment.');
+      // create async process
+      var done    = this.async();
+      // save context
+      var context = this;
+      // require dependencies
+      this.dependencies = require(this.cfg.paths.dependencies);
+      // message
+      this.info('Retreive dependencies config succeed.');
+      // require folders
+      this.folders      = require(this.cfg.paths.folders);
+      // message
+      this.info('Retreive folders structures succeed.');
+      // message
+      this.warning([ 'Try to connect on', this.cfg.angular.url,
+                     'to retreive angular available versions' ].join(' '));
+      // process request
+      request(this.cfg.angular.url, function (error, response, body) {
+        // has error
+        if (!error && response.statusCode === 200) {
+          // default resolution
+          var m;
+          // default rules
+          var re = /href="([0-9]\.[0-9]\.[0-9])\/\"/gm; 
 
-            {
-                name        : 'appDescription',
-                message     : 'What is your app\'s desription ?',
-                validate    : function(input) {
-                    if( input.length >9 )
-                        return true;
-                    else
-                        return 'Please enter a valid application description (Min 10 Chars)';
-                }
-            },
-
-            {
-                name        : 'appVersion',
-                message     : 'What is your app\'s version (format x.x.x) ?',
-                default     : '0.1.0',
-                validate    : function(input) {
-                    var reg = /^(\d+)\.(\d+)\.(\d+)$/;
-                    if( reg.exec(input))
-                        return true;
-                    else
-                        return false;
-                }
-            },
-
-            {
-                name    : 'appIsPrivate',
-                type    : 'list',
-                message : 'Your app\'s is private ?',
-                choices : ['true', 'false'],
-            }];
-
-            this.prompt(prompts, function (props) {
-                this.appName        = props.appName;
-                this.appDescription = props.appDescription;
-                this.appVersion     = props.appVersion;
-                this.appIsPrivate   = props.appIsPrivate;
-                done();
-            }.bind(this));
-        },
-
-        /**
-         * Ask user about wich npm dependencie optional he want install
-         *
-         * @method promptNpmDependenciesOptional
-         */
-        promptNpmDependenciesOptional : function() {
-            if( ! _.isEmpty(this.listNpmDependenciesOptional) )
-            {
-                var done = this.async();
-                var prompts = [{
-                    type    : 'checkbox',
-                    name    : 'npmDepOption',
-                    message : 'Select which dependencies you want to install (click on "space" for select/unselect) :',
-                    choices : this.listNpmDependenciesOptional
-                }];
-
-                this.prompt(prompts, function (props) {
-                    _.forEach(props.npmDepOption, function(val){
-                        this.listNpmDependencies.push(val);
-                    }, this);
-                    done();
-                }.bind(this));
-            }
-        },
-
-        /**
-        * Ask user about wich type of database he want install
-        *
-        * @method promptDbChoices
-         */
-        promptDbChoices : function() {
-            var done = this.async();
-            var prompts = [{
-                type    : 'list',
-                name    : 'npmDbChoice',
-                message : 'Select which type of database you want to install :',
-                choices : this.dbConfigPossibles
-            }];
-
-            this.prompt(prompts, function (props) {
-                    this.dbType=props.npmDbChoice;
-                done();
-            }.bind(this));
+          // parse all
+          while ((m = re.exec(body)) !== null) {
+            context.cfg.angular.versions.push(m[1]);
+          }
+          // reverse array
+          context.cfg.angular.versions      = _(context.cfg.angular.versions).reverse().value();
+          // and set default resolution
+          context.cfg.angular.resolution    = _.first(context.cfg.angular.versions);
+          // message
+          context.info('Retreive angular version succeed.');
+          // end process
+          done();
         }
+      });
     },
-
     /**
-     * Handle configuration : make all directory ...
-     *
-     * @submodule configuring
+     * Choose which type of app we need
      */
-    configuring : {
-        /**
-         * Create all folders present in "config/folders.json"
-         * Add '.gitignore' file in each created folder
-         *
-         * @method scaffoldFolders
-         */
-        scaffoldFolders : function() {
-            _.forEach( this.pathFolders.folders, function(value) {
-                mkdirp(value.path);
-                logger.info( _(['New folder created :', value.path]).join(' ') );
-                this.copy('_.gitignore', _([value.path,'.gitignore']).join('/') );
+    chooseAppType : function () {
+      // default banner
+      this.banner('Now it time to tell use which type of application you want');
+      // create an async process
+      var done = this.async();
 
-            }, this);
-        },
-
-        /**
-         * Handle DB dependencies in correlation with the dbType choosen
-         * Add specifics dependencies to install
-         *
-         * @method setDependenciesDB
-         */
-        setDependenciesDB : function() {
-            _.forEach( npmDependenciesFile.db, function(db) {
-                if(this.dbType === db.type )
-                {
-                    _.forEach(db.dependencies, function(dep) {
-                        this.listNpmDependencies.push(dep);
-                    } ,this )   ;
-                }
-            }, this );
-        }
-    },
-
-    /**
-     * Generate specifics files : package.json, routes...
-     *
-     * @submodule writing
-     */
-    writing : {
-        /**
-         *Generate files :
-         *	 - gruntfile.js
-         *	 - package.json
-         *
-         * @method generateAllFiles
-         */
-        generateAllFiles : function() {
-            var context = {
-                siteName            : this.appName,
-                siteDescription     : this.appDescription,
-                siteVersion         : this.appVersion,
-                siteIsPrivate       : this.appIsPrivate
-            };
-
-            this.copy('_gruntfile.js', 'Gruntfile.js');
-            this.template('_package.json', 'package.json', context);
-        }
-    },
-
-    /**
-     * Install all dependencies : npm and Bower
-     *
-     * @submodule install
-     */
-    install : {
-        /**
-         * Install all npm dependencies
-         *
-         * @method installNpmDependencies
-         */
-        installNpmDependencies : function() {
-            this.log('Install npm dependencies');
-            _.forEach(this.listNpmDependencies, function(dep) {
-                if (_.isString(dep))
-                {
-                    this.npmInstall([dep], { 'save': true });
-                    logger.info('Package installed : ' + dep );
-                }
-                else
-                {
-                    this.npmInstall( _([dep.name,dep.version]).join("@") );
-                    logger.info(  _(['Package installed : ', dep.name, dep.version]).join("@") );
-                }
-            }, this);
-        },
-
-        /**
-         * Install all bower dependencies
-         *
-         * @method installBowerDependencies
-         */
-        installBowerDependencies : function() {
-        }
+      // define app choises
+      var appChoices = [ 'A NodeJs application', 'An AngularJs application',
+                         'A NodeJs application with AngularJs' ];
+      // prompt message
+      this.prompt([ {
+        name    : 'typeApp',
+        message : 'What type of application you want to generate ?',
+        type    : 'list',
+        choices : appChoices
+      }], function (props) {
+        // generate node app state
+        this.cfg.generate.node    = (props.typeApp === _.first(appChoices) ||
+                                     props.typeApp === _.last(appChoices));
+        // generate node app state
+        this.cfg.generate.angular = (props.typeApp === appChoices[1] ||
+                                     props.typeApp === _.last(appChoices));
+        // end process
+        done();
+      }.bind(this));
     }
+  }
 });

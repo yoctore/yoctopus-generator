@@ -1,33 +1,21 @@
 {
-  "folders" : [
-    { "path" : "app" },
-    { "path" : "app/controllers" },
-    { "path" : "app/models" },
-    { "path" : "app/models/data" },
-    { "path" : "app/static" },
-    { "path" : "app/static/content" },
-    { "path" : "app/views" },
-    { "path" : "app/views/common" },
-    { "path" : "app/views/layout" },
-    { "path" : "app/views/partials" },
-    { "path" : "app/views/social" },
-    { "path" : "config" },
-    { "path" : "config/env" },
-    { "path" : "daemons" },
-    { "path" : "host_config" },
-    { "path" : "public" },
-    { "path" : "public/assets" },
-    { "path" : "public/assets/css" },
-    { "path" : "public/assets/js" },
-    { "path" : "public/error" },
-    { "path" : "public/icons" },
-    { "path" : "public/media" },
-    { "path" : "rollouts" },
-    { "path" : "routes" },
-    { "path" : "script" },
-    { "path" : "script/gm" },
-    { "path" : "script/run" },
-    { "path" : "yocto_modules" },
-    { "path" : "node_modules" }
-    ]
+  "node" : [
+    "models",
+    "controller",
+    "routes",
+    "config",
+    "daemon",
+    "scripts",
+    "daemon",
+    "rollouts"
+  ],
+  "angular" : [
+    "public/assets/css/src",
+    "public/assets/css/dist",
+    "public/assets/js/src",
+    "public/assets/js/dist"
+  ],
+  "extra" : [
+    
+  ]
 }
