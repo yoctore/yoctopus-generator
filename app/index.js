@@ -7,6 +7,10 @@ var n           = require('n-api');
 var request     = require('request');
 var chalk       = require('chalk');
 var logger      = require('yocto-logger');
+var spdx        = require('spdx');
+var isEmail     = require('isemail');
+var isUrl       = require('is-url');
+var path        = require('path');
 
 /**
  * Default export
@@ -54,6 +58,15 @@ module.exports = generators.Base.extend({
       exit = _.isBoolean(exit) ? exit : false;
       // TODO here
 
+      // normalize path
+      var p = path.normalize([ [ process.cwd(), './app/ascii', name ].join('/'),
+                               'txt' ].join('.'));
+
+      // file exists 
+      if (this.fs.exists(p)) {
+        // log message
+        this.log(this.fs.read(p));
+      }
       // exit ?
       if (exit) {
         process.exit(0);
@@ -140,13 +153,13 @@ module.exports = generators.Base.extend({
   /**
    * Initializing part
    */
-  initializing : {
+  initializing  : {
     /**
      * Default banner
      */
     welcome       : function () {
       // process welcome message
-      this.asciiMessage('welcome');
+      this.asciiMessage('welcome-coffee');
     },
     /**
      * Default Ready function
@@ -221,13 +234,14 @@ module.exports = generators.Base.extend({
      */
     chooseAppType : function () {
       // default banner
-      this.banner('Now it time to tell us which type of application you want');
+      this.banner('Now it\'s time to tell us which type of application you want');
       // create an async process
       var done = this.async();
 
       // define app choises
-      var appChoices = [ 'A NodeJs application', 'An AngularJs application',
-                         'A NodeJs application with AngularJs' ];
+      var appChoices = [ 'An application only based on NodeJs',
+                         'An application only based on AngularJs',
+                         'An application based on NodeJs & AngularJs' ];
       // prompt message
       this.prompt([ {
         name    : 'typeApp',
@@ -239,8 +253,8 @@ module.exports = generators.Base.extend({
         this.cfg.generate.node    = (props.typeApp === _.first(appChoices) ||
                                      props.typeApp === _.last(appChoices));
         // generate node app state
-        this.cfg.generate.angular = (props.typeApp === appChoices[1] ||
-                                     props.typeApp === _.last(appChoices));
+        this.cfg.generate.angular = (props.typeApp === _.last(appChoices) || 
+                                     props.typeApp === appChoices[1]);
         // end process
         done();
       }.bind(this));
@@ -249,56 +263,261 @@ module.exports = generators.Base.extend({
   /**
    * Do more complex user interact
    */
-  prompting : {
+  prompting     : {
     /**
      * Process node package configuration choices
      */
-    nodePackage : function () {
-      // create an async process
-      var done = this.async();
-      // define prompts here
-      var prompts = [ {
-        name        : 'name',
-        message     : 'What is your application name ?',
-        validate    : function (input) {
-          // default statement
-          return !_.isEmpty(input) ? true : 'Please enter a valid application name.'
+    nodeBasePackage   : function () {
+      // process node package ?
+      if (this.cfg.generate.node) {
+        // banner message
+        this.banner('Now tell us some informations about your NodeJs configuration.');
+        // create an async process
+        var done = this.async();
+        // define prompts here
+        var prompts = [ {
+          name        : 'name',
+          message     : 'What is your application name ?',
+          validate    : function (input) {
+            // default statement
+            return !_.isEmpty(input) ? true : 'Please enter a valid application name.'
+          }
+        },
+        {
+          name        : 'description',
+          message     : 'What is your application description ?',
+          validate    : function (input) {
+            // default statement
+            return !_.isEmpty(input) && input.length > 10 ? true :
+                   'Please enter a valid description with at least 10 chars';
+          }
+        },
+        {
+          name        : 'version',
+          message     : 'What is your application version (x.x.x) ?',
+          default     : '0.1.0',
+          validate    : function (input) {
+            // default rules
+            var reg = /^(\d+)\.(\d+)\.(\d+)$/;
+            // default statement
+            return !_.isNull(reg.exec(input));
+          }
+        },
+        {
+          name        : 'private',
+          type        : 'confirm',
+          message     : 'Your application is private ?'
+        },
+        {
+          name        : 'license',
+          type        : 'list',
+          default     : 'Apache-2.0',
+          message     : 'Which licence for your application ?',
+          choices     : spdx.licenses
+        },
+        {
+          name        : 'authorName',
+          message     : 'What is the author for this app ?',
+          default     : this.user.git.name()
+        },
+        {
+          name        : 'authorEmail',
+          message     : 'What is the author email for this app ?',
+          default     : this.user.git.email(),
+          validate    : function (input) {
+            // default statement
+            return isEmail(input) ? true : 'Please enter a valid email';
+          }
+        },
+        {
+          name        : 'authorUrl',
+          message     : 'What is the author url for this app ?',
+          validate    : function (input) {
+            // default statement
+            return _.isEmpty(input) ? true : (isUrl(input) ? true : 'Please enter a valid url');
+          }
+        },
+        {
+          name        : 'engines',
+          type        : 'list',
+          message     : 'Which version of node your application must depend ?',
+          choices     : this.cfg.nVersions,
+          default     : _.last(this.cfg.nVersions)
         }
-      },
-      {
-        name        : 'description',
-        message     : 'What is your application desription ?',
-        validate    : function (input) {
-          // default statement
-          return !_.isEmpty(input) && input.length > 10 ? true :
-                 'Please enter a valid description with at least 10 chars';
-        }
-      },
-      {
-        name        : 'version',
-        message     : 'What is your application version (format x.x.x) ?',
-        default     : '0.1.0',
-        validate    : function (input) {
-          // default rules
-          var reg = /^(\d+)\.(\d+)\.(\d+)$/;
-          // default statement
-          return !_.isNull(reg.exec(input));
-        }
-      },
-      {
-        name        : 'private',
-        type        : 'confirm',
-        message     : 'Your application is private ?'
-      } ];
+        ];
+  
+        // process prompting
+        this.prompt(prompts, function (props) {
+          // format engines process
+          props.engines = { node : [ '>=', props.engines ].join('') }
+          
+          // normalize author
+          _.extend(props, { 
+            author : { 
+              name  : props.authorName,
+              email : props.authorEmail,
+              url   : props.authorUrl
+            }
+          });
+  
+          // delete non needed data
+          delete props.authorName;
+          delete props.authorEmail;
+          delete props.authorUrl;
+  
+          // extend object
+          this.node = _.extend({}, props);
+  
+          // end process
+          done();
+        }.bind(this));
+      }
+    },
+    /**
+     * Process bower package configuration choices
+     */
+    bowerBasePackage  : function () {
+      // process node package ?
+      if (this.cfg.generate.angular) {
+        // banner message
+        this.banner('Now tell us some informations about your AngularJS configuration.');
+        // create an async process
+        var done    = this.async();
+        // define prompts here
+        var prompts = [];
 
-      // process prompting
-      this.prompt(prompts, function (props) {
-        this.node = _.extend({}, props);
-        console.log(this.node);
+        // default obj to use if nodeja app is not defined
+        var defaultObj = [ {
+          name        : 'name',
+          message     : 'What is your application name ?',
+          validate    : function (input) {
+            // default statement
+            return !_.isEmpty(input) ? true : 'Please enter a valid application name.'
+          }
+        },
+        {
+          name        : 'description',
+          message     : 'What is your application description ?',
+          validate    : function (input) {
+            // default statement
+            return !_.isEmpty(input) && input.length > 10 ? true :
+                   'Please enter a valid description with at least 10 chars';
+          }
+        },
+        {
+          name        : 'version',
+          message     : 'What is your application version (x.x.x) ?',
+          default     : '0.1.0',
+          validate    : function (input) {
+            // default rules
+            var reg = /^(\d+)\.(\d+)\.(\d+)$/;
+            // default statement
+            return !_.isNull(reg.exec(input));
+          }
+        },
+        {
+          name        : 'private',
+          type        : 'confirm',
+          message     : 'Your application is private ?'
+        },
+        {
+          name        : 'license',
+          type        : 'list',
+          default     : 'Apache-2.0',
+          message     : 'Which licence for your application ?',
+          choices     : spdx.licenses
+        },
+        {
+          name        : 'authorName',
+          message     : 'What is the author for this app ?',
+          default     : this.user.git.name()
+        },
+        {
+          name        : 'authorEmail',
+          message     : 'What is the author email for this app ?',
+          default     : this.user.git.email(),
+          validate    : function (input) {
+            // default statement
+            return isEmail(input) ? true : 'Please enter a valid email';
+          }
+        },
+        {
+          name        : 'authorUrl',
+          message     : 'What is the author url for this app ?',
+          validate    : function (input) {
+            // default statement
+            return _.isEmpty(input) ? true : (isUrl(input) ? true : 'Please enter a valid url');
+          }
+        } ];
 
-        // end process
-        done();
+        // si node app is not defined add default prompt data
+        if (!this.cfg.generate.node) {
+          // parse all item
+          _.each(defaultObj, function (obj) {
+            // add item
+            prompts.push(obj);
+          })
+        }
+
+        if (!_.isEmpty(prompts)) {
+          // process prompting
+          this.prompt(prompts, function (props) {
+  
+            // normalize author
+            _.extend(props, { 
+              author : { 
+                name  : props.authorName,
+                email : props.authorEmail,
+                url   : props.authorUrl
+              }
+            });
+  
+            // delete non needed data
+            delete props.authorName;
+            delete props.authorEmail;
+            delete props.authorUrl;
+  
+            // extend object
+            this.angular = _.extend({}, props);
+
+            // end process
+            done();
+          }.bind(this));
+        } else {
+          // assign data
+          this.angular = _.clone(this.node);
+          // remove non needed data
+          delete this.angular.engines;
+          // message
+          this.info('We are using your nodejs configuration for your angular configuration.');
+          // end process
+          done();
+        } 
+      }
+    },
+    /**
+     * Process choice for structure generation
+     */
+    generateFolders   : function () {
+      // create async process
+      var done    = this.async();
+      // banner message
+      this.banner('So maybe you want to generate a file structure for your app');
+
+      this.prompt([ {
+        name    : 'struture',
+        type    : 'confirm',
+        default : true,
+        message : [ 'Do confirm that you want generate',
+                    'project structure based on your app type choice ?' ].join(' ')
+      }], function (props) {
+        // extend config
+        _.extend(this.cfg, props);
+        console.log(this.cfg);
       }.bind(this));
+      
+      
     }
-  }
+  },
+
 });
