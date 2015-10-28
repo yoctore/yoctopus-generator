@@ -140,18 +140,18 @@ module.exports = generators.Base.extend({
   /**
    * Initializing part
    */
-  initializing  : {
+  initializing : {
     /**
      * Default banner
      */
-    welcome   : function () {
+    welcome       : function () {
       // process welcome message
       this.asciiMessage('welcome');
     },
     /**
      * Default Ready function
      */
-    ready             : function () {
+    ready         : function () {
       // create an async process
       var done = this.async();
 
@@ -174,7 +174,7 @@ module.exports = generators.Base.extend({
     /**
      * Retreive here dependencies / folders and angular versions
      */
-    init : function () {
+    init          : function () {
       // default banner
       this.banner('We are initializing some data. Take a cofee and wait a few moment.');
       // create async process
@@ -221,7 +221,7 @@ module.exports = generators.Base.extend({
      */
     chooseAppType : function () {
       // default banner
-      this.banner('Now it time to tell use which type of application you want');
+      this.banner('Now it time to tell us which type of application you want');
       // create an async process
       var done = this.async();
 
@@ -241,6 +241,61 @@ module.exports = generators.Base.extend({
         // generate node app state
         this.cfg.generate.angular = (props.typeApp === appChoices[1] ||
                                      props.typeApp === _.last(appChoices));
+        // end process
+        done();
+      }.bind(this));
+    }
+  },
+  /**
+   * Do more complex user interact
+   */
+  prompting : {
+    /**
+     * Process node package configuration choices
+     */
+    nodePackage : function () {
+      // create an async process
+      var done = this.async();
+      // define prompts here
+      var prompts = [ {
+        name        : 'name',
+        message     : 'What is your application name ?',
+        validate    : function (input) {
+          // default statement
+          return !_.isEmpty(input) ? true : 'Please enter a valid application name.'
+        }
+      },
+      {
+        name        : 'description',
+        message     : 'What is your application desription ?',
+        validate    : function (input) {
+          // default statement
+          return !_.isEmpty(input) && input.length > 10 ? true :
+                 'Please enter a valid description with at least 10 chars';
+        }
+      },
+      {
+        name        : 'version',
+        message     : 'What is your application version (format x.x.x) ?',
+        default     : '0.1.0',
+        validate    : function (input) {
+          // default rules
+          var reg = /^(\d+)\.(\d+)\.(\d+)$/;
+          // default statement
+          return !_.isNull(reg.exec(input));
+        }
+      },
+      {
+        name        : 'private',
+        type        : 'confirm',
+        message     : 'Your application is private ?'
+      } ];
+
+      // process prompting
+      this.prompt(prompts, function (props) {
+        this.node = _.extend({}, props);
+        console.log(this.node);
+
         // end process
         done();
       }.bind(this));
