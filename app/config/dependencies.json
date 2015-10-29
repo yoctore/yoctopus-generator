@@ -4,6 +4,11 @@
       "yocto-core-stack"
     ],
     "devDependencies" : [
+      "grunt",
+      "grunt-contrib-copy",
+      "grunt-contrib-uglify",
+      "grunt-contrib-clean",
+      "grunt-contrib-concat",
       "yocto-hint"
     ]
   },
@@ -11,6 +16,32 @@
     "dependencies" : [
     ],
     "devDependencies" : [
+      "grunt",
+      "grunt-ng-annotate",
+      "html2js"
     ]
+  },
+  "extra" : {
+    "node" : {
+      "dependencies" : [
+        "yocto-mailer",
+        "yocto-utils",
+        "q",
+        "async",
+        "lodash",
+        "less"
+      ],
+      "devDependencies" : [
+        "grunt"
+      ]
+    },
+    "angular" : {
+      "dependencies" : [
+        "yocto-angular-jwt"
+      ],
+      "devDependencies" : [
+        "grunt-contrib-cssmin"
+      ]
+    }
   }
 }

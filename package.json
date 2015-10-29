@@ -25,6 +25,7 @@
     "app"
   ],
   "dependencies": {
+    "async": "^1.5.0",
     "chalk": "^1.1.1",
     "is-url": "^1.2.1",
     "isemail": "^1.2.0",

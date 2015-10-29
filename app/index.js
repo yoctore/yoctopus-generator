@@ -12,6 +12,7 @@ var isEmail     = require('isemail');
 var isUrl       = require('is-url');
 var path        = require('path');
 var uuid        = require('uuid');
+var async       = require('async');
 
 /**
  * Default export
@@ -369,8 +370,8 @@ module.exports = generators.Base.extend({
           name        : 'engines',
           type        : 'list',
           message     : 'Which version of node your application must depend ?',
-          choices     : this.cfg.nVersions,
-          default     : _.last(this.cfg.nVersions)
+          choices     : _(this.cfg.nVersions).reverse().value(),
+          default     : _.first(this.cfg.nVersions)
         } ]);
   
         // process prompting
@@ -558,7 +559,7 @@ module.exports = generators.Base.extend({
     /**
      * Generate folders if is set to true
      */
-    generateFolders : function () {
+    generateFolders             : function () {
       // default file struture
       var structure = [];
       // build structure ?
@@ -585,6 +586,74 @@ module.exports = generators.Base.extend({
         _.extend(this.cfg.structure, { directory : structure } );
       }
     },
-    
+    /**
+     * Generate config for you app
+     */
+    generateExtraDependencies   : function () {
+      // create async process
+      var done = this.async();
+
+      // to execute
+      async.eachSeries([ 'dependencies', 'devDependencies' ], function (type, next) {
+        // prompt list
+        var prompt = [];
+
+        // generate node ?
+        if (this.cfg.generate.node && !_.isEmpty(this.dependencies.extra.node[type])) {
+          // add in prompt dependencies
+          prompt.push({
+            name    : 'nDependencies',
+            type    : 'checkbox',
+            message : [ 'Choose extra', type, 'for your NodeJs application :' ].join(' '),
+            choices : this.dependencies.extra.node[type]
+          });
+        }
+        // generate angular ?
+        if (this.cfg.generate.angular && !_.isEmpty(this.dependencies.extra.angular[type])) {
+          // add in prompt dependencies
+          prompt.push({
+            name    : 'aDependencies',
+            type    : 'checkbox',
+            message : [ 'Choose extra', type, 'for your AngularJs application :' ].join(' '),
+            choices : this.dependencies.extra.angular[type]
+          });
+        }
+        // Is empty ?
+        if (!_.isEmpty(prompt)) {
+          // banner message
+          this.banner([ 'Maybe you want install extra', type ].join(' '));
+          // prompt elements
+          this.prompt(prompt, function (props) {
+            // node ?
+            if (this.cfg.generate.node) {
+              // change dependencies for ndoe
+              this.dependencies.node[type] = _.flatten([ this.dependencies.node[type],
+                                                         props.nDependencies ]);
+            }
+
+            // angular ?
+            if (this.cfg.generate.angular) {
+              // change dependencies for angular
+              this.dependencies.angular[type] = _.flatten([ this.dependencies.angular[type],
+                                                            props.nDependencies ]);
+            }
+            // next process
+            next();
+          }.bind(this));
+        } else {
+          // next process
+          next();
+        }
+      }.bind(this), function () {
+        // end process
+        done();
+      });
+    }
+  },
+  /**
+   * writing process
+   */
+  writing   : {
+  
   }
 });
