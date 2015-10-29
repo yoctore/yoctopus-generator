@@ -404,7 +404,7 @@ module.exports = generators.Base.extend({
     /**
      * Process bower package configuration choices
      */
-    bowerBasePackage  : function () {
+    bowerBasePackage              : function () {
       // process node package ?
       if (this.cfg.generate.angular) {
         // banner message
@@ -526,7 +526,7 @@ module.exports = generators.Base.extend({
     /**
      * Process choice for structure generation
      */
-    generateFolders   : function () {
+    generateFolders               : function () {
       // create async process
       var done    = this.async();
       // banner message
@@ -552,7 +552,7 @@ module.exports = generators.Base.extend({
     /**
      * Process choice for structure generation
      */
-    forceRemoveExistingFolders   : function () {
+    forceRemoveExistingFolders    : function () {
       // create async process
       var done    = this.async();
       // banner message
@@ -565,14 +565,14 @@ module.exports = generators.Base.extend({
         type    : 'confirm',
         default : false,
         message : [ 'Do confirm that you allow us to remove existing',
-                    'directory structure if exists ?' ].join(' ') ].join(' ')
+                    'directory structure if exists ?' ].join(' ')
       },
       {
         name    : 'eraseConfirm',
         type    : 'confirm',
         default : false,
         message : chalk.red([ 'Do you confirm your previous action ? (This must run a',
-                              'rm -r of existing directory)' ].join(' ')
+                              'rm -r of existing directory)' ].join(' '))
       }], function (props) {
         // extend config
         _.extend(this.cfg, { erase : props.erase === props.eraseConfirm });
