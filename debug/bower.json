@@ -1,0 +1,19 @@
+{
+  "name" : "c6888b02-3bd4-44b6-898b-262999587cfb",
+  "description" : "105b91d4-e506-48f7-88ff-d26d7377908f",
+  "version" : "0.1.0",
+  "private" : true,
+  "scripts" : {},
+  "author"  : {
+    "name"  : "Mathieu ROBERT",
+    "email" : "mathieu.robert@yocto.re",
+    "url"   : ""
+  }
+  "contributors" : [],
+  "maintainers" : [],
+  "license"  : "Apache-2.0",
+  "files" : [],
+  "keywords" : [],
+  "dependencies" : {},
+  "devDependencies" : {}
+}

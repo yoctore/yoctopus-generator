@@ -29,7 +29,8 @@
         "q",
         "async",
         "lodash",
-        "less"
+        "less",
+        "yocto-mongoose"
       ],
       "devDependencies" : [
         "grunt"

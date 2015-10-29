@@ -13,6 +13,7 @@ var isUrl       = require('is-url');
 var path        = require('path');
 var uuid        = require('uuid');
 var async       = require('async');
+var fs          = require('fs');
 
 /**
  * Default export
@@ -92,6 +93,7 @@ module.exports = generators.Base.extend({
      * @return {String} generated path
      */
     this.prefixPath = function (path) {
+
       // is debug ?
       if (this.cfg.debug) {
         // normalize process
@@ -187,8 +189,11 @@ module.exports = generators.Base.extend({
         if (props.ready) {
           // enable debug mode
           this.cfg.debug = props.debug;
-          // log ascii debug
-          this.asciiMessage('debug-mode');
+          // is debug ?
+          if (this.cfg.debug) {
+            // log ascii debug
+            this.asciiMessage('debug-mode');
+          }
           // end process
           done();
         } else {
@@ -373,12 +378,12 @@ module.exports = generators.Base.extend({
           choices     : _(this.cfg.nVersions).reverse().value(),
           default     : _.first(this.cfg.nVersions)
         } ]);
-  
+
         // process prompting
         this.prompt(prompts, function (props) {
           // format engines process
-          props.engines = { node : [ '>=', props.engines ].join('') }
-          
+          props.engines = { node : props.engines };
+
           // normalize author
           _.extend(props, { 
             author : { 
@@ -387,15 +392,15 @@ module.exports = generators.Base.extend({
               url   : props.authorUrl
             }
           });
-  
+
           // delete non needed data
           delete props.authorName;
           delete props.authorEmail;
           delete props.authorUrl;
-  
+
           // extend object
           this.node = _.extend({}, props);
-  
+
           // end process
           done();
         }.bind(this));
@@ -571,8 +576,8 @@ module.exports = generators.Base.extend({
         name    : 'eraseConfirm',
         type    : 'confirm',
         default : false,
-        message : chalk.red([ 'Do you confirm your previous action ? (This must run a',
-                              'rm -r of existing directory)' ].join(' '))
+        message : chalk.yellow([ 'Do you confirm your previous action ? (This must run a',
+                                 'rm -r of existing directory)' ].join(' '))
       }], function (props) {
         // extend config
         _.extend(this.cfg, { erase : props.erase === props.eraseConfirm });
@@ -633,7 +638,7 @@ module.exports = generators.Base.extend({
           prompt.push({
             name    : 'nDependencies',
             type    : 'checkbox',
-            message : [ 'Choose extra', type, 'for your NodeJs application :' ].join(' '),
+            message : [ 'Choosed extra', type, 'for your NodeJs application :' ].join(' '),
             choices : this.dependencies.extra.node[type]
           });
         }
@@ -643,7 +648,7 @@ module.exports = generators.Base.extend({
           prompt.push({
             name    : 'aDependencies',
             type    : 'checkbox',
-            message : [ 'Choose extra', type, 'for your AngularJs application :' ].join(' '),
+            message : [ 'Choosed extra', type, 'for your AngularJs application :' ].join(' '),
             choices : this.dependencies.extra.angular[type]
           });
         }
@@ -683,6 +688,98 @@ module.exports = generators.Base.extend({
    * writing process
    */
   writing   : {
-  
+    /**
+     * Deleting existing file
+     */
+    deleteExistingFile  : function () {
+      // erase mode
+      if (this.cfg.erase) {
+        // banner message
+        this.banner('We will check and erase your existing project structure');
+        var dirname = this.prefixPath('/');
+        console.log(dirname);
+      }
+    },
+    /**
+     * Build template files for you app
+     */
+    generateTemplates   : function () {
+      // create async process
+      var done = this.async();
+
+      // to execute
+      async.eachSeries([ 'node', 'angular' ], function (type, next) {
+
+        // default config auto process
+        var config = {
+          node : {
+            template  : {
+              source      : '_package.json',
+              destination : 'package.json'
+            },
+            name      : 'NodeJs'
+          },
+          angular : {
+            template  : {
+              source      : '_bower.json',
+              destination : 'bower.json'
+            },
+            name      : 'AngularJs'
+          },
+        };
+
+        // find type
+        var current = config[type];
+
+        // is undefined ?
+        if (!_.isUndefined(current)) {
+          // generate node ?
+          if (this.cfg.generate[type]) {
+            // banner message
+            this.banner([ 'We will build your',current.template.destination,
+                          'for your', current.name, 'application' ].join(' '));
+
+            // file exists ?
+            if (!this.fs.exists(this.prefixPath(current.template.destination))) {
+              // copy template with data
+              this.fs.copyTpl(
+                this.templatePath(current.template.source),
+                this.destinationPath(this.prefixPath(current.template.destination)),
+                                     this[type]);
+              // success message
+              this.info([ 'File', current.template.destination,
+                          'was correctly created & builded.' ].join(' '));
+              // next process
+              next();
+            } else {
+              // error message
+              this.error([ [ 'Cannot create & build file',
+                             current.template.destination ].join(' '),
+                             '. this file must be remove first'
+                           ].join('')
+                        );
+              // next process
+              next();
+            }
+          }
+        } else {
+          // set error
+          this.error([ 'Cannot find config for', type ].join(' '));
+          next();
+        }
+      }.bind(this), function () {
+        // end process
+        done();
+      });
+    }
   }
 });
+
+
+
+
+
+
+
+
+

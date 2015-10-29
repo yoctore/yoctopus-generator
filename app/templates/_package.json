@@ -1,0 +1,22 @@
+{
+  "name" : "<%= name %>",
+  "description" : "<%= description %>",
+  "version" : "<%= version %>",
+  "private" : <%- private %>,
+  "scripts" : {},
+  "author"  : {
+    "name"  : "<%= author.name %>",
+    "email" : "<%= author.email %>",
+    "url"   : "<%= author.url %>"
+  }
+  "contributors" : [],
+  "maintainers" : [],
+  "license"  : "<%= license %>",
+  "engines"  : {
+    "node" : ">=<%= engines.node %>"
+  },
+  "files" : [],
+  "keywords" : [],
+  "dependencies" : {},
+  "devDependencies" : {}
+}
