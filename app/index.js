@@ -11,6 +11,7 @@ var spdx        = require('spdx');
 var isEmail     = require('isemail');
 var isUrl       = require('is-url');
 var path        = require('path');
+var uuid        = require('uuid');
 
 /**
  * Default export
@@ -59,8 +60,7 @@ module.exports = generators.Base.extend({
       // TODO here
 
       // normalize path
-      var p = path.normalize([ [ process.cwd(), './app/ascii', name ].join('/'),
-                               'txt' ].join('.'));
+      var p = this.normalizePath([ [ './app/ascii', name ].join('/'), 'txt' ].join('.'));
 
       // file exists 
       if (this.fs.exists(p)) {
@@ -72,15 +72,16 @@ module.exports = generators.Base.extend({
         process.exit(0);
       }
     };
+
     /**
      * Utility method to normalize given
      *
-     * @param {String} path current path to use
+     * @param {String} p current path to use
      * @return {String} generated path
      */
-    this.normalizePath = function (path) {
+    this.normalizePath = function (p) {
       // default statement
-      return path.normalize([ process.cwd(), path ].join('/'));
+      return path.normalize([ process.cwd(), p ].join('/'));
     };
 
     /**
@@ -93,7 +94,7 @@ module.exports = generators.Base.extend({
       // is debug ?
       if (this.cfg.debug) {
         // normalize process
-        return this.normalizePath([ 'example', path ].join('/'));
+        return this.normalizePath([ '/debug', path ].join('/'));
       }
       // default statement
       return path;
@@ -173,12 +174,25 @@ module.exports = generators.Base.extend({
         name    : 'ready',
         message : 'This process will take ~5 minutes. Are your ready ?',
         type    : 'confirm'
+      },
+      {
+        name    : 'debug',
+        type    : 'confirm',
+        message : [ 'Do you want run this process in debug mode ?',
+                   '(we will create and use debug directory for',
+                    'data generation process)' ].join(' ')
       }], function (props) {
+        // ready ?
         if (props.ready) {
+          // enable debug mode
+          this.cfg.debug = props.debug;
+          // log ascii debug
+          this.asciiMessage('debug-mode');
+          // end process
           done();
         } else {
           // process coffee message
-          this.asciiMessage('wait-coffee', true);
+          this.asciiMessage('goodbye', true);
         }
 
       }.bind(this));
@@ -274,8 +288,11 @@ module.exports = generators.Base.extend({
         this.banner('Now tell us some informations about your NodeJs configuration.');
         // create an async process
         var done = this.async();
-        // define prompts here
-        var prompts = [ {
+
+        /**
+         * Default base object to prefill if we are in debug mode
+         */
+        var baseObj = [ {
           name        : 'name',
           message     : 'What is your application name ?',
           validate    : function (input) {
@@ -291,7 +308,18 @@ module.exports = generators.Base.extend({
             return !_.isEmpty(input) && input.length > 10 ? true :
                    'Please enter a valid description with at least 10 chars';
           }
-        },
+        } ];
+
+        // is debug ?
+        if (this.cfg.debug) {
+          _.each(baseObj, function (value) {
+            // add a random value for debug mode
+            _.extend(value, { default : uuid.v4() });
+          }, this);
+        }
+
+        // define prompts here
+        var prompts = _.flatten([ baseObj,
         {
           name        : 'version',
           message     : 'What is your application version (x.x.x) ?',
@@ -343,8 +371,7 @@ module.exports = generators.Base.extend({
           message     : 'Which version of node your application must depend ?',
           choices     : this.cfg.nVersions,
           default     : _.last(this.cfg.nVersions)
-        }
-        ];
+        } ]);
   
         // process prompting
         this.prompt(prompts, function (props) {
@@ -505,19 +532,59 @@ module.exports = generators.Base.extend({
       this.banner('So maybe you want to generate a file structure for your app');
 
       this.prompt([ {
-        name    : 'struture',
+        name    : 'structure',
         type    : 'confirm',
         default : true,
         message : [ 'Do confirm that you want generate',
                     'project structure based on your app type choice ?' ].join(' ')
       }], function (props) {
         // extend config
-        _.extend(this.cfg, props);
-        console.log(this.cfg);
+        _.extend(this.cfg, {
+          structure : {
+            enable : props.structure
+          }
+        });
+        // end process
+        done();
       }.bind(this));
       
       
     }
   },
+  /**
+   * configuring process
+   */
+  configuring   : {
+    /**
+     * Generate folders if is set to true
+     */
+    generateFolders : function () {
+      // default file struture
+      var structure = [];
+      // build structure ?
+      if (this.cfg.structure.enable) {
+        // is node ?
+        if (this.cfg.generate.node) {
+          structure.push(this.folders.node);
+        }
+        // angular structure ?
+        if (this.cfg.generate.angular) {
+          structure.push(this.folders.angular);
+        }
+        // extra structure ??
+        structure.push(this.folders.extra);
+        // fatten data to have one level depth of data
+        structure = _.flatten(structure);
+        // map each structure
+        structure = _.map(structure, function (s) {
+          // default statement
+          return this.prefixPath(s);
+        }, this);
 
+        // extend structure
+        _.extend(this.cfg.structure, { directory : structure } );
+      }
+    },
+    
+  }
 });

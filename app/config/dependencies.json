@@ -6,5 +6,11 @@
     "devDependencies" : [
       "yocto-hint"
     ]
+  },
+  "angular" : {
+    "dependencies" : [
+    ],
+    "devDependencies" : [
+    ]
   }
 }

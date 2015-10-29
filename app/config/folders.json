@@ -3,19 +3,26 @@
     "models",
     "controller",
     "routes",
-    "config",
-    "daemon",
-    "scripts",
-    "daemon",
-    "rollouts"
+    "views",
+    "config"
   ],
   "angular" : [
-    "public/assets/css/src",
+    "private",
+    "public/error",
+    "public/icons",
+    "public/media",
+    "public/assets/icons",
+    "public/assets/font",
+    "public/assets/css/src/less",
     "public/assets/css/dist",
     "public/assets/js/src",
     "public/assets/js/dist"
   ],
   "extra" : [
-    
+    "daemon",
+    "scripts",
+    "daemons",
+    "rollouts",
+    "documentation"
   ]
 }
