@@ -1,7 +1,6 @@
 'use strict';
 
 var generators  = require('yeoman-generator');
-var mkdirp      = require('mkdirp');
 var _           = require('lodash');
 var n           = require('n-api');
 var request     = require('request');
@@ -13,7 +12,7 @@ var isUrl       = require('is-url');
 var path        = require('path');
 var uuid        = require('uuid');
 var async       = require('async');
-var fs          = require('fs');
+var fs          = require('fs-extra');
 
 /**
  * Default export
@@ -692,12 +691,28 @@ module.exports = generators.Base.extend({
      * Deleting existing file
      */
     deleteExistingFile  : function () {
+      // create async process
+      var done = this.async();
       // erase mode
       if (this.cfg.erase) {
         // banner message
         this.banner('We will check and erase your existing project structure');
+        // get dirname dirname
         var dirname = this.prefixPath('/');
-        console.log(dirname);
+
+        // directory is empty ?
+        fs.emptyDir(dirname, function (err) {
+          // has error ?
+          if (err) {
+            fs.walk(dirname)
+            .on('data', function (item) {
+              console.log(item);
+            })
+            .on('end', function () {
+              
+            });
+          }
+        }.bind(this));
       }
     },
     /**
