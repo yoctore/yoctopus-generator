@@ -548,8 +548,37 @@ module.exports = generators.Base.extend({
         // end process
         done();
       }.bind(this));
-      
-      
+    },
+    /**
+     * Process choice for structure generation
+     */
+    forceRemoveExistingFolders   : function () {
+      // create async process
+      var done    = this.async();
+      // banner message
+      this.banner([ 'We need to know if you allow us',
+                    'to remove existing project stucture is exists' ].join(' '));
+
+      // list of prompts
+      this.prompt([ {
+        name    : 'erase',
+        type    : 'confirm',
+        default : false,
+        message : [ 'Do confirm that you allow us to remove existing',
+                    'directory structure if exists ?' ].join(' ') ].join(' ')
+      },
+      {
+        name    : 'eraseConfirm',
+        type    : 'confirm',
+        default : false,
+        message : chalk.red([ 'Do you confirm your previous action ? (This must run a',
+                              'rm -r of existing directory)' ].join(' ')
+      }], function (props) {
+        // extend config
+        _.extend(this.cfg, { erase : props.erase === props.eraseConfirm });
+        // end process
+        done();
+      }.bind(this));
     }
   },
   /**
