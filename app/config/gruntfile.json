@@ -1,42 +1,57 @@
 {
   "config" : [
     {
+      "name"  : "pkg",
+      "value" : [
+        "grunt.file.readJSON('package.json')"
+      ]
+    },
+    {
       "name"  : "yoctohint",
       "value" : [
-        "{ options : {}, all : [ 'Gruntfile.js' ] }"
+        "options : {}, all : [ 'Gruntfile.js' ]"
       ]
     },
     {
       "name"  : "uglify",
       "value" : [ 
-        "{ options : { banner  : '/* <%= pkg.name %> - <%= pkg.description %> - V<%= pkg.version %> */\\n' } }",
-        "{ api : { files : [ { expand : true, cwd : 'src', src : '**/*.js', dest : 'dist' } ] } }"
+        "options : { banner  : '/* <%= pkg.name %> - <%= pkg.description %> - V<%= pkg.version %> */\\n' }",
+        "api : { files : [ { expand : true, cwd : 'src', src : '**/*.js', dest : 'dist' } ] }"
       ]
     },
     {
       "name"  : "mochacli",
       "value" : [
-        "{ options : { 'reporter' : 'spec', 'inline-diffs' : false, 'no-exit' : true, 'force' : false, 'check-leaks' : true, 'bail' : false } }",
-        "{ all : [ 'test/*.js' ] }"
+        "options : { 'reporter' : 'spec', 'inline-diffs' : false, 'no-exit' : true, 'force' : false, 'check-leaks' : true, 'bail' : false }",
+        "all : [ 'test/*.js' ]"
       ]
     }
   ],
   "load" : [ "grunt-contrib-uglify", "grunt-mocha-cli", "yocto-hint" ],
   "register"  : [
     {
+      "name" : "uglify",
+      "description" : "Processing minifications your js file",
+      "value" : "uglify"
+    },
+    {
       "name" : "hint",
+      "description" : "Hint & validate your code with JsHint et JSCS",
       "value" : "yoctohint"
     },
     {
       "name" : "tests",
+      "description" : "Running defined unit tests",
       "value" : "mochacli"
     },
     {
       "name" : "build",
+      "description" : "Processing Hint, unit tests, and minification",
       "value" : [ "hint", "tests", "uglify" ]
     },
     {
       "name" : "default",
+      "description" : "Processing default build",
       "value" : "build"
     }
   ]

@@ -16,6 +16,8 @@ var fs              = require('fs-extra');
 var Spinner         = require('cli-spinner').Spinner;
 var time            = require('time');
 var GruntfileEditor = require('gruntfile-editor');
+var jsbeauty        = require('js-beautify')['js_beautify'];
+var yosay           = require('yosay');
 
 /**
  * Default export
@@ -64,7 +66,8 @@ module.exports = generators.Base.extend({
       codes       : {
         eManual   : 500,
         dFailed   : 501,
-        fFailed   : 502
+        fFailed   : 502,
+        gFailed   : 503
       },
       ascii       : {
         coffee    : 'coffee',
@@ -216,7 +219,7 @@ module.exports = generators.Base.extend({
      */
     welcome       : function () {
       // process welcome message
-      this.asciiMessage(this.cfg.ascii.welcome);
+      this.log(yosay('Hello, and welcome to YoctopusJs generator.'));
     },
     /**
      * Default debug choices
@@ -309,6 +312,7 @@ module.exports = generators.Base.extend({
 
           // parse all
           while ((m = re.exec(body)) !== null) {
+            // add version to list
             this.cfg.angular.versions.push(m[1]);
           }
           // reverse array
@@ -324,32 +328,6 @@ module.exports = generators.Base.extend({
         }
       }.bind(this));
     },
-    /**
-     * Generate Gruntfile
-     */
-    generateGruntFile   : function () {
-      // create async process
-      var done        = this.async();
-
-      // banner message
-      this.banner('We will generate your Gruntfile.js configuration');
-
-      // reach each config
-      async.eachSeries(this.gruntConfig.config, function (config, next) {
-        // save config
-        var c = config.value.join(',');
-        // is empty ?
-        if (!_.isEmpty(c)) {
-          // add config
-          this.gruntEditor.insertConfig(config.name, c);
-        }
-        // insert new gruntfile configuration
-        next();
-      }.bind(this), function () {
-        console.log(this.gruntEditor.toString());
-      }.bind(this));
-    },
-
     /**
      * Choose which type of app we need
      */
@@ -1034,7 +1012,71 @@ module.exports = generators.Base.extend({
         done();
       });
     },
+    /**
+     * Generate Gruntfile
+     */
+    generateGruntFile   : function () {
+      // create async process
+      var done        = this.async();
 
+      // banner message
+      this.banner('We will generate your Gruntfile.js configuration');
+
+      // start spinner
+      this.spinner.start();
+      // reach each config
+      async.eachSeries(this.gruntConfig.config, function (config, next) {
+        // normalize
+        var c = config.value.join(',');
+        // pkg property ?
+        if (config.name !== 'pkg') {
+          c = [ '{', c, '}' ].join(' ');
+        }
+
+        // is empty ?
+        if (!_.isEmpty(c)) {
+          // add config
+          this.gruntEditor.insertConfig(config.name, c);
+        }
+        // insert new gruntfile configuration
+        next();
+      }.bind(this), function () {
+        // reach load
+        this.gruntEditor.loadNpmTasks(this.gruntConfig.load);
+        // reach register
+        async.eachSeries(this.gruntConfig.register, function (register, next) {
+          // register task
+          this.gruntEditor.registerTask(register.name, register.description, register.value);
+          // next item
+          next();
+        }.bind(this) , function () {
+          // beautidy content
+          var content = jsbeauty(this.gruntEditor.toString(), { 'indent_size' : 2 });
+          // replace some brakets and ":"
+          content = content.replace(/\[/g, '[ ').replace(/\]/g, ' ]').replace(/(a-zA-Z)?:/g, ' :');
+          // write file
+          fs.writeFile(this.prefixPath('Gruntfile.js'), content, function (err) {
+            // start a timeout here
+            var timeout = setTimeout(function () {
+              // stop spinner
+              this.spinner.stop(true);
+              // err ?
+              if (!err) {
+                // message
+                this.info('Your Gruntfile.js was correctly created.');
+                // end
+                done();
+              } else {
+                // error message
+                this.error([ 'Cannnot generate Gruntfile.js :', err ].join(' '));
+                // exit cannot continue
+                process.exit(this.cfg.codes.gFailed);
+              }
+            }.bind(this), 2000);
+          }.bind(this));
+        }.bind(this));
+      }.bind(this));
+    }
   },
 });
 
