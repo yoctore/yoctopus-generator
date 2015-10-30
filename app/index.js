@@ -13,6 +13,8 @@ var path        = require('path');
 var uuid        = require('uuid');
 var async       = require('async');
 var fs          = require('fs-extra');
+var Spinner     = require('cli-spinner').Spinner;
+var time        = require('time');
 
 /**
  * Default export
@@ -24,6 +26,11 @@ module.exports = generators.Base.extend({
   constructor   :  function () {
     // Calling the super constructor is important so our generator is correctly set up
     generators.Base.apply(this, arguments);
+
+    /**
+     * Default spinner instance
+     */
+    this.spinner  = new Spinner('%s');
 
     /**
      * Default internal config
@@ -46,8 +53,23 @@ module.exports = generators.Base.extend({
       generate    : {
         node    : false,
         angular : false 
+      },
+      codes       : {
+        eManual   : 500,
+        dFailed   : 501,
+        fFailed   : 502
+      },
+      ascii       : {
+        coffee    : 'coffee',
+        debug     : 'debug-mode',
+        bye       : 'goodbye',
+        welcome   : 'welcome'
       }
     };
+
+    process.on('exit', function (code) {
+      console.log('TODO HERE yoctopus ascii art');
+    }.bind(this));
 
     /**
      * Default ascii method to display content to ascii
@@ -58,19 +80,31 @@ module.exports = generators.Base.extend({
     this.asciiMessage = function (name, exit) {
       // normalize exit process
       exit = _.isBoolean(exit) ? exit : false;
-      // TODO here
 
       // normalize path
       var p = this.normalizePath([ [ './app/ascii', name ].join('/'), 'txt' ].join('.'));
 
       // file exists 
       if (this.fs.exists(p)) {
+        // save current content
+        var content = this.fs.read(p);
+
+        // is debug ?
+        if (name === this.cfg.ascii.debug) {
+          content = chalk.blue(content);
+        }
+
+        // is coffee ?
+        if (name === this.cfg.ascii.coffee) {
+          content = chalk.green(content);
+        }
+
         // log message
-        this.log(this.fs.read(p));
+        this.log(content);
       }
       // exit ?
       if (exit) {
-        process.exit(0);
+        process.exit(this.cfg.codes.eManual);
       }
     };
 
@@ -92,7 +126,6 @@ module.exports = generators.Base.extend({
      * @return {String} generated path
      */
     this.prefixPath = function (path) {
-
       // is debug ?
       if (this.cfg.debug) {
         // normalize process
@@ -108,8 +141,22 @@ module.exports = generators.Base.extend({
      * @param {String} message message to display
      */
     this.banner = function (message) {
+      // process diff
+      var diff = time.time() - this.time;
+      // t to process
+      var t    = time.localtime(diff)
+      // build time
+      t        = _.compact(
+                  _.flatten([
+                   [ (t.minutes > 0 ? [ t.minutes, 'minutes' ].join(' ') : '') ],
+                   [ (t.seconds > 0 ? [ t.seconds, 'seconds' ].join(' ') : '') ]
+                  ])
+                 );
+      // build items
+      t = !_.isEmpty(t) ? _.compact([ '(Time elapsed : ', t, ')' ]).join('') : '';
+
       // process banner
-      logger.banner([ '[', this.cfg.name, '] -', message ].join(' '));
+      logger.banner([ '[', this.cfg.name, '] -', message, t ].join(' '));
     };
     /**
      * Default utility method to log message on generator
@@ -162,8 +209,35 @@ module.exports = generators.Base.extend({
      */
     welcome       : function () {
       // process welcome message
-      this.asciiMessage('welcome-coffee');
+      this.asciiMessage(this.cfg.ascii.welcome);
     },
+    /**
+     * Default debug choices
+     */
+    debugMode     : function () {
+      // create an async process
+      var done = this.async();
+
+      // prompt message
+      this.prompt([ {
+        name    : 'debug',
+        type    : 'confirm',
+        message : [ 'Do you want run this process in debug mode ?',
+                   '(we will create and use debug directory for',
+                    'data generation process)' ].join(' ')
+      }], function (props) {
+        // enable debug mode
+        this.cfg.debug = props.debug;
+        // is debug ?
+        if (this.cfg.debug) {
+          // log ascii debug
+          this.asciiMessage(this.cfg.ascii.debug);
+        }
+        // end process
+        done();
+      }.bind(this));
+    },
+
     /**
      * Default Ready function
      */
@@ -176,28 +250,16 @@ module.exports = generators.Base.extend({
         name    : 'ready',
         message : 'This process will take ~5 minutes. Are your ready ?',
         type    : 'confirm'
-      },
-      {
-        name    : 'debug',
-        type    : 'confirm',
-        message : [ 'Do you want run this process in debug mode ?',
-                   '(we will create and use debug directory for',
-                    'data generation process)' ].join(' ')
       }], function (props) {
         // ready ?
         if (props.ready) {
-          // enable debug mode
-          this.cfg.debug = props.debug;
-          // is debug ?
-          if (this.cfg.debug) {
-            // log ascii debug
-            this.asciiMessage('debug-mode');
-          }
-          // end process
+          // set start time
+          this.time = time.time();
+          // next process
           done();
         } else {
-          // process coffee message
-          this.asciiMessage('goodbye', true);
+          // exit with correct code
+          process.exit(this.cfg.codes.eManual);
         }
 
       }.bind(this));
@@ -211,8 +273,7 @@ module.exports = generators.Base.extend({
       this.banner('We are initializing some data. Take a cofee and wait a few moment.');
       // create async process
       var done    = this.async();
-      // save context
-      var context = this;
+
       // require dependencies
       this.dependencies = require(this.cfg.paths.dependencies);
       // message
@@ -224,6 +285,8 @@ module.exports = generators.Base.extend({
       // message
       this.warning([ 'Try to connect on', this.cfg.angular.url,
                      'to retreive angular available versions' ].join(' '));
+      // start spinner
+      this.spinner.start();
       // process request
       request(this.cfg.angular.url, function (error, response, body) {
         // has error
@@ -235,18 +298,20 @@ module.exports = generators.Base.extend({
 
           // parse all
           while ((m = re.exec(body)) !== null) {
-            context.cfg.angular.versions.push(m[1]);
+            this.cfg.angular.versions.push(m[1]);
           }
           // reverse array
-          context.cfg.angular.versions      = _(context.cfg.angular.versions).reverse().value();
+          this.cfg.angular.versions      = _(this.cfg.angular.versions).reverse().value();
           // and set default resolution
-          context.cfg.angular.resolution    = _.first(context.cfg.angular.versions);
+          this.cfg.angular.resolution    = _.first(this.cfg.angular.versions);
+          // stop spinner
+          this.spinner.stop(true);
           // message
-          context.info('Retreive angular version succeed.');
+          this.info('Retreive angular version succeed.');
           // end process
           done();
         }
-      });
+      }.bind(this));
     },
     /**
      * Choose which type of app we need
@@ -286,7 +351,7 @@ module.exports = generators.Base.extend({
     /**
      * Process node package configuration choices
      */
-    nodeBasePackage   : function () {
+    nodeBasePackage               : function () {
       // process node package ?
       if (this.cfg.generate.node) {
         // banner message
@@ -418,8 +483,10 @@ module.exports = generators.Base.extend({
         // define prompts here
         var prompts = [];
 
-        // default obj to use if nodeja app is not defined
-        var defaultObj = [ {
+        /**
+         * Default base object to prefill if we are in debug mode
+         */
+        var baseObj = [ {
           name        : 'name',
           message     : 'What is your application name ?',
           validate    : function (input) {
@@ -435,7 +502,18 @@ module.exports = generators.Base.extend({
             return !_.isEmpty(input) && input.length > 10 ? true :
                    'Please enter a valid description with at least 10 chars';
           }
-        },
+        } ];
+
+        // is debug ?
+        if (this.cfg.debug) {
+          _.each(baseObj, function (value) {
+            // add a random value for debug mode
+            _.extend(value, { default : uuid.v4() });
+          }, this);
+        }
+
+        // default obj to use if nodeja app is not defined
+        var defaultObj = _.flatten([ baseObj, 
         {
           name        : 'version',
           message     : 'What is your application version (x.x.x) ?',
@@ -480,7 +558,7 @@ module.exports = generators.Base.extend({
             // default statement
             return _.isEmpty(input) ? true : (isUrl(input) ? true : 'Please enter a valid url');
           }
-        } ];
+        } ]);
 
         // si node app is not defined add default prompt data
         if (!this.cfg.generate.node) {
@@ -575,8 +653,7 @@ module.exports = generators.Base.extend({
         name    : 'eraseConfirm',
         type    : 'confirm',
         default : false,
-        message : chalk.yellow([ 'Do you confirm your previous action ? (This must run a',
-                                 'rm -r of existing directory)' ].join(' '))
+        message : chalk.yellow('Do you confirm your previous action ?')
       }], function (props) {
         // extend config
         _.extend(this.cfg, { erase : props.erase === props.eraseConfirm });
@@ -637,7 +714,8 @@ module.exports = generators.Base.extend({
           prompt.push({
             name    : 'nDependencies',
             type    : 'checkbox',
-            message : [ 'Choosed extra', type, 'for your NodeJs application :' ].join(' '),
+            message : [ 'Choosed extra', type,
+                        'for your NodeJs application (optionnal) :' ].join(' '),
             choices : this.dependencies.extra.node[type]
           });
         }
@@ -647,7 +725,8 @@ module.exports = generators.Base.extend({
           prompt.push({
             name    : 'aDependencies',
             type    : 'checkbox',
-            message : [ 'Choosed extra', type, 'for your AngularJs application :' ].join(' '),
+            message : [ 'Choosed extra', type,
+                        'for your AngularJs application (optionnal) :' ].join(' '),
             choices : this.dependencies.extra.angular[type]
           });
         }
@@ -684,9 +763,27 @@ module.exports = generators.Base.extend({
     }
   },
   /**
-   * writing process
+   * Writing process
    */
   writing   : {
+    /**
+     * Default coffee message
+     */
+    coffeeMsg           : function () {
+      // create async process
+      var done = this.async();
+      // process welcome message
+      this.asciiMessage(this.cfg.ascii.coffee);
+      // start spinner
+      this.spinner.start();
+      // start a timeout here
+      var timeout = setTimeout(function () {
+        // stop spinner
+        this.spinner.stop(true);
+        // next process
+        done();
+      }.bind(this), 2000);
+    },
     /**
      * Deleting existing file
      */
@@ -699,18 +796,28 @@ module.exports = generators.Base.extend({
         this.banner('We will check and erase your existing project structure');
         // get dirname dirname
         var dirname = this.prefixPath('/');
-
+        // start spinner
+        this.spinner.start();
         // directory is empty ?
         fs.emptyDir(dirname, function (err) {
           // has error ?
-          if (err) {
-            fs.walk(dirname)
-            .on('data', function (item) {
-              console.log(item);
-            })
-            .on('end', function () {
-              
-            });
+          if (!err) {
+            // start a timeout here
+            var timeout = setTimeout(function () {
+              // stop spinner
+              this.spinner.stop(true);
+              // clear timeout
+              clearTimeout(timeout);
+              // info message
+              this.info('Your project directory was cleaned. Processing next step.');
+              // end async
+              done();
+            }.bind(this), 2000);
+          } else {
+            // message
+            this.error([ 'Cannot clean your directory :', err ].join(' '));
+            // stop we cannot continue
+            process.exit(this.cfg.codes.dFailed);
           }
         }.bind(this));
       }
@@ -752,29 +859,54 @@ module.exports = generators.Base.extend({
           if (this.cfg.generate[type]) {
             // banner message
             this.banner([ 'We will build your',current.template.destination,
-                          'for your', current.name, 'application' ].join(' '));
+                          'for your', current.name, 'configuration' ].join(' '));
 
+            // start spinner
+            this.spinner.start();
             // file exists ?
             if (!this.fs.exists(this.prefixPath(current.template.destination))) {
-              // copy template with data
-              this.fs.copyTpl(
-                this.templatePath(current.template.source),
-                this.destinationPath(this.prefixPath(current.template.destination)),
-                                     this[type]);
-              // success message
-              this.info([ 'File', current.template.destination,
-                          'was correctly created & builded.' ].join(' '));
-              // next process
-              next();
+              // write file 
+              fs.writeJson(this.prefixPath(current.template.destination),
+                           this[type], function (err) {
+
+                // has no error ?
+                if (!err) {
+                  // start a timeout here
+                  var timeout = setTimeout(function () {
+                    // stop spinner
+                    this.spinner.stop(true);
+                    // clear timeout
+                    clearTimeout(timeout);
+                    // success message
+                    this.info([ 'File', current.template.destination,
+                                'was correctly created & builded.' ].join(' '));
+                    // next process
+                    next();
+                  }.bind(this), 2000);
+                } else {
+                  // success message
+                  this.error([ 'Cannot create', current.template.destination,
+                              'file :', err ].join(' '));
+                  // exit cannot continue
+                  process.exit(this.cfg.codes.fFailed);
+                }
+              }.bind(this));
             } else {
-              // error message
-              this.error([ [ 'Cannot create & build file',
-                             current.template.destination ].join(' '),
-                             '. this file must be remove first'
-                           ].join('')
-                        );
-              // next process
-              next();
+              // start a timeout here
+              var timeout = setTimeout(function () {
+                // stop spinner
+                this.spinner.stop(true);
+                // clear timeout
+                clearTimeout(timeout);
+                // error message
+                this.error([ [ 'Cannot create & build file',
+                               current.template.destination ].join(' '),
+                               '. this file must be remove first'
+                             ].join('')
+                          );
+                // next process
+                next();
+              }.bind(this), 2000);
             }
           }
         } else {
@@ -786,8 +918,92 @@ module.exports = generators.Base.extend({
         // end process
         done();
       });
+    },
+    /**
+     * Build directory files for you app
+     */
+    generateDirectory   : function () {
+      // create async process
+      var done = this.async();
+
+      // to execute
+      async.eachSeries([ 'node', 'angular' ], function (type, next) {
+
+        // default config auto process
+        var config = { node     : { name : 'NodeJs' },
+                       angular  : { name : 'AngularJs' }
+                     };
+
+        // find type
+        var current = config[type];
+
+        // is undefined ?
+        if (!_.isUndefined(current)) {
+          // generate with tyoe ?
+          if (this.cfg.generate[type]) {
+            // banner message
+            this.banner([ 'We will build your folders',
+                          'for your', current.name, 'configuration' ].join(' '));
+
+            // empty dir ?
+            if (!_.isEmpty(this.folders[type])) {
+              // start spinner
+              this.spinner.start();
+              // parse all folders
+              async.eachSeries(this.folders[type], function (folder, nextFolder) {
+                // create item
+                fs.mkdirs(this.prefixPath(folder), function (err) {
+                  // has error ?
+                  if (!err) {
+                    // check if is last item
+                    if (_.last(this.folders[type]) === folder) {
+                      // start a timeout here
+                      var timeout = setTimeout(function () {
+                        // stop spinner
+                        this.spinner.stop(true);
+                        // clear timeout
+                        clearTimeout(timeout);
+                        // info
+                        this.info([ 'Folders for your', current.name,
+                                    'configuration was created.' ].join(' '));
+                        // next process
+                        next();
+                      }.bind(this), 2000);
+                    } else {
+                      // process next folder
+                      nextFolder();
+                    }
+                  } else {
+                    // stop spinner
+                    this.spinner.stop(true);
+                    // error message
+                    this.error([ 'An error occured when we try to create the folder [', folder,
+                                 '] :', err ].join(' '));
+                    // next process
+                    next();
+                  }
+                }.bind(this));
+              }.bind(this));
+            }
+          }
+        } else {
+          // set error
+          this.error([ 'Cannot find config for', type ].join(' '));
+          // next process
+          next();
+        }
+      }.bind(this), function () {
+        // end process
+        done();
+      });
+    },
+    /**
+     * Generate Gruntfile
+     */
+    generateGruntFile   : function () {
+      
     }
-  }
+  },
 });
 
 

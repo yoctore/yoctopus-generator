@@ -1,0 +1,15 @@
+{
+  "name": "b4792254-d8e2-4dd7-a7b1-27cfffed1985",
+  "description": "44742bce-1ee3-4430-9148-19b68dc4274e",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "engines": {
+    "node": "5.0.0"
+  },
+  "author": {
+    "name": "Mathieu ROBERT",
+    "email": "mathieu.robert@yocto.re",
+    "url": ""
+  }
+}

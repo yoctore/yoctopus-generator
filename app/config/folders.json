@@ -4,7 +4,8 @@
     "controller",
     "routes",
     "views",
-    "config"
+    "config",
+    "documentation"
   ],
   "angular" : [
     "private",
@@ -16,13 +17,7 @@
     "public/assets/css/src/less",
     "public/assets/css/dist",
     "public/assets/js/src",
-    "public/assets/js/dist"
-  ],
-  "extra" : [
-    "daemon",
-    "scripts",
-    "daemons",
-    "rollouts",
+    "public/assets/js/dist",
     "documentation"
   ]
 }

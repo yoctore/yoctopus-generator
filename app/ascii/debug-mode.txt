@@ -1,7 +1,20 @@
 
-
-
-
-DEBUg MODE ENABLE
-
-
+####################################################
+#                                                  #
+#              DEBUG MODE IS ENABLED               #
+#                                                  #
+#   This mode must to be used only if we need to   #
+#   test the current generator, to keep safe any   #
+#        existing data on current folder.          #
+#                                                  #
+#  This mode will create all needed configuration  #
+#     installation, project structure and other    #
+#        things in a folder named [ debug ]        #
+#                                                  #
+#    If you want to generate a real project just   #
+#    restart our generator and select no when we   # 
+#             ask to you this question             #
+#                                                  #
+#   Do you want run this process in debug mode ?   #
+#                                                  #
+####################################################
