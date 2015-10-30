@@ -1,20 +1,21 @@
 'use strict';
 
-var generators  = require('yeoman-generator');
-var _           = require('lodash');
-var n           = require('n-api');
-var request     = require('request');
-var chalk       = require('chalk');
-var logger      = require('yocto-logger');
-var spdx        = require('spdx');
-var isEmail     = require('isemail');
-var isUrl       = require('is-url');
-var path        = require('path');
-var uuid        = require('uuid');
-var async       = require('async');
-var fs          = require('fs-extra');
-var Spinner     = require('cli-spinner').Spinner;
-var time        = require('time');
+var generators      = require('yeoman-generator');
+var _               = require('lodash');
+var n               = require('n-api');
+var request         = require('request');
+var chalk           = require('chalk');
+var logger          = require('yocto-logger');
+var spdx            = require('spdx');
+var isEmail         = require('isemail');
+var isUrl           = require('is-url');
+var path            = require('path');
+var uuid            = require('uuid');
+var async           = require('async');
+var fs              = require('fs-extra');
+var Spinner         = require('cli-spinner').Spinner;
+var time            = require('time');
+var GruntfileEditor = require('gruntfile-editor');
 
 /**
  * Default export
@@ -26,11 +27,16 @@ module.exports = generators.Base.extend({
   constructor   :  function () {
     // Calling the super constructor is important so our generator is correctly set up
     generators.Base.apply(this, arguments);
+    /**
+     * Current grunt file editor. we dont use yeaoman generator beacuse
+     * we can't remove autoloading of Gruntfile.js
+     */
+    this.gruntEditor  = new GruntfileEditor();
 
     /**
      * Default spinner instance
      */
-    this.spinner  = new Spinner('%s');
+    this.spinner      = new Spinner('%s');
 
     /**
      * Default internal config
@@ -48,7 +54,8 @@ module.exports = generators.Base.extend({
       debug       : true,
       paths       : {
         dependencies  : './config/dependencies.json',
-        folders       : './config/folders.json'
+        folders       : './config/folders.json',
+        grunt         : './config/gruntfile.json'
       },
       generate    : {
         node    : false,
@@ -282,6 +289,10 @@ module.exports = generators.Base.extend({
       this.folders      = require(this.cfg.paths.folders);
       // message
       this.info('Retreive folders structures succeed.');
+      // require grunt config
+      this.gruntConfig  = require(this.cfg.paths.grunt);
+      // message
+      this.info('Retreive grunt config succeed.');
       // message
       this.warning([ 'Try to connect on', this.cfg.angular.url,
                      'to retreive angular available versions' ].join(' '));
@@ -313,6 +324,32 @@ module.exports = generators.Base.extend({
         }
       }.bind(this));
     },
+    /**
+     * Generate Gruntfile
+     */
+    generateGruntFile   : function () {
+      // create async process
+      var done        = this.async();
+
+      // banner message
+      this.banner('We will generate your Gruntfile.js configuration');
+
+      // reach each config
+      async.eachSeries(this.gruntConfig.config, function (config, next) {
+        // save config
+        var c = config.value.join(',');
+        // is empty ?
+        if (!_.isEmpty(c)) {
+          // add config
+          this.gruntEditor.insertConfig(config.name, c);
+        }
+        // insert new gruntfile configuration
+        next();
+      }.bind(this), function () {
+        console.log(this.gruntEditor.toString());
+      }.bind(this));
+    },
+
     /**
      * Choose which type of app we need
      */
@@ -997,12 +1034,7 @@ module.exports = generators.Base.extend({
         done();
       });
     },
-    /**
-     * Generate Gruntfile
-     */
-    generateGruntFile   : function () {
-      
-    }
+
   },
 });
 

@@ -1,0 +1,43 @@
+{
+  "config" : [
+    {
+      "name"  : "yoctohint",
+      "value" : [
+        "{ options : {}, all : [ 'Gruntfile.js' ] }"
+      ]
+    },
+    {
+      "name"  : "uglify",
+      "value" : [ 
+        "{ options : { banner  : '/* <%= pkg.name %> - <%= pkg.description %> - V<%= pkg.version %> */\\n' } }",
+        "{ api : { files : [ { expand : true, cwd : 'src', src : '**/*.js', dest : 'dist' } ] } }"
+      ]
+    },
+    {
+      "name"  : "mochacli",
+      "value" : [
+        "{ options : { 'reporter' : 'spec', 'inline-diffs' : false, 'no-exit' : true, 'force' : false, 'check-leaks' : true, 'bail' : false } }",
+        "{ all : [ 'test/*.js' ] }"
+      ]
+    }
+  ],
+  "load" : [ "grunt-contrib-uglify", "grunt-mocha-cli", "yocto-hint" ],
+  "register"  : [
+    {
+      "name" : "hint",
+      "value" : "yoctohint"
+    },
+    {
+      "name" : "tests",
+      "value" : "mochacli"
+    },
+    {
+      "name" : "build",
+      "value" : [ "hint", "tests", "uglify" ]
+    },
+    {
+      "name" : "default",
+      "value" : "build"
+    }
+  ]
+}

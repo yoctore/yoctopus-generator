@@ -9,16 +9,14 @@
       "grunt-contrib-uglify",
       "grunt-contrib-clean",
       "grunt-contrib-concat",
-      "yocto-hint"
+      "yocto-hint",
+      "grunt-mocha-cli"
     ]
   },
   "angular" : {
     "dependencies" : [
     ],
     "devDependencies" : [
-      "grunt",
-      "grunt-ng-annotate",
-      "html2js"
     ]
   },
   "extra" : {
