@@ -1,10 +1,10 @@
 'use strict';
 
 var logger    = require('yocto-logger');
-var core      = require('yoctopus-js');
+var core      = require('yocto-core-stack');
 var _         = require('lodash');
 
-// set debug to true
+// set debug to true. Disabled it on production
 core.debug = true;
 
 // Init your app first

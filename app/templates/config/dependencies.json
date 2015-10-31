@@ -18,20 +18,21 @@
       "jquery",
       "bootstrap",
       "angular",
+      "angular-cookies",
+      "angular-resource",
       "angular-messages",
-      "angular-local-storage",
       "angular-touch",
-      "angular-media-queries",
       "angular-password",
-      "angular-ui-router",
       "angular-animate",
-      "moment",
-      "angular-translate",
       "angular-sanitize",
-      "angular-route",
       "angular-bootstrap",
       "angular-ui-router",
-      "angulartics"
+      "angular-filter",
+      "angular-local-storage",
+      "angulartics",
+      "angular-media-queries",
+      "angular-translate",
+      "moment"
     ],
     "devDependencies" : [
     ]

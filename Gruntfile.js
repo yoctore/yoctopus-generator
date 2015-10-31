@@ -8,7 +8,7 @@ module.exports = function (grunt) {
     // hint our app
     yoctohint : {
       options  : {},
-      all      : [ 'src/***', 'Gruntfile.js' ]
+      all      : [ 'app/index.js', 'Gruntfile.js' ]
     },
     // Uglify our app
     uglify    : {

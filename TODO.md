@@ -1,1 +1,0 @@
-Changer angular => bower dans les fihier json et js source pour utiliser le npm (A réfléchir)

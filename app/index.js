@@ -1,5 +1,8 @@
 'use strict';
 
+// tricks for hinter
+var jsbeautyKey     = 'js_beauty';
+// dependencies
 var generators      = require('yeoman-generator');
 var _               = require('lodash');
 var n               = require('n-api');
@@ -16,7 +19,7 @@ var fs              = require('fs-extra');
 var Spinner         = require('cli-spinner').Spinner;
 var time            = require('time');
 var GruntfileEditor = require('gruntfile-editor');
-var jsbeauty        = require('js-beautify')['js_beautify'];
+var jsbeauty        = require('js-beautify')[jsbeautyKey];
 var yosay           = require('yosay');
 
 /**
@@ -52,7 +55,7 @@ module.exports = generators.Base.extend({
         versions    : [ 'latest' ]
       },
       delay       : 2000,
-      name        : 'Yocto Stack generator',
+      name        : 'YoctopusJs',
       nVersions   : n.ls(),
       debug       : true,
       paths       : {
@@ -62,7 +65,7 @@ module.exports = generators.Base.extend({
       },
       generate    : {
         node    : false,
-        angular : false 
+        angular : false
       },
       codes       : {
         eManual   : 500,
@@ -79,6 +82,8 @@ module.exports = generators.Base.extend({
     };
 
     process.on('exit', function (code) {
+      if (code === 1) {
+      }
       console.log('TODO HERE yoctopus ascii art');
     }.bind(this));
 
@@ -96,7 +101,7 @@ module.exports = generators.Base.extend({
       var p = this.normalizePath([ [ this.sourceRoot() , 'ascii', name ].join('/'),
                                    'txt' ].join('.'));
 
-      // file exists 
+      // file exists
       if (this.fs.exists(p)) {
         // save current content
         var content = this.fs.read(p);
@@ -109,6 +114,11 @@ module.exports = generators.Base.extend({
         // is coffee ?
         if (name === this.cfg.ascii.coffee) {
           content = chalk.green(content);
+        }
+
+        // is coffee ?
+        if (name === this.cfg.ascii.welcome) {
+          content = chalk.cyan(content);
         }
 
         // log message
@@ -149,15 +159,15 @@ module.exports = generators.Base.extend({
     };
 
     /**
-     * Default utility method to display a banner message
+     * Return elasped time label
      *
-     * @param {String} message message to display
+     * @return {String} elapsed time
      */
-    this.banner = function (message) {
+    this.getElapsedTime = function () {
       // process diff
       var diff = time.time() - this.time;
       // t to process
-      var t    = time.localtime(diff)
+      var t    = time.localtime(diff);
       // build time
       t        = _.compact(
                   _.flatten([
@@ -166,8 +176,17 @@ module.exports = generators.Base.extend({
                   ])
                  );
       // build items
-      t = !_.isEmpty(t) ? _.compact([ '(Time elapsed : ', t, ')' ]).join('') : '';
+      return !_.isEmpty(t) ? _.compact([ '(Time elapsed : ', [ t ].join(''), ')' ]).join('') : '';
+    };
 
+    /**
+     * Default utility method to display a banner message
+     *
+     * @param {String} message message to display
+     */
+    this.banner = function (message) {
+      // get elasped time
+      var t = this.getElapsedTime();
       // process banner
       logger.banner([ '[', this.cfg.name, '] -', message, t ].join(' '));
     };
@@ -268,6 +287,8 @@ module.exports = generators.Base.extend({
         if (props.ready) {
           // set start time
           this.time = time.time();
+          // ascii message
+          this.asciiMessage('welcome');
           // next process
           done();
         } else {
@@ -311,7 +332,7 @@ module.exports = generators.Base.extend({
           // default resolution
           var m;
           // default rules
-          var re = /href="([0-9]\.[0-9]\.[0-9])\/\"/gm; 
+          var re = /href="([0-9]\.[0-9]\.[0-9])\/\"/gm;
 
           // parse all
           while ((m = re.exec(body)) !== null) {
@@ -355,7 +376,7 @@ module.exports = generators.Base.extend({
         this.cfg.generate.node    = (props.typeApp === _.first(appChoices) ||
                                      props.typeApp === _.last(appChoices));
         // generate node app state
-        this.cfg.generate.angular = (props.typeApp === _.last(appChoices) || 
+        this.cfg.generate.angular = (props.typeApp === _.last(appChoices) ||
                                      props.typeApp === appChoices[1]);
         // end process
         done();
@@ -385,7 +406,7 @@ module.exports = generators.Base.extend({
           message     : 'What is your application name ?',
           validate    : function (input) {
             // default statement
-            return !_.isEmpty(input) ? true : 'Please enter a valid application name.'
+            return !_.isEmpty(input) ? true : 'Please enter a valid application name.';
           }
         },
         {
@@ -447,7 +468,7 @@ module.exports = generators.Base.extend({
         },
         {
           name        : 'authorUrl',
-          message     : 'What is the author url for this app ?',
+          message     : 'What is the author url for this app ? (Optional)',
           validate    : function (input) {
             // default statement
             return _.isEmpty(input) ? true : (isUrl(input) ? true : 'Please enter a valid url');
@@ -469,8 +490,8 @@ module.exports = generators.Base.extend({
           props.name = _.deburr(_.snakeCase(props.name)).replace('_', '-');
 
           // normalize author
-          _.extend(props, { 
-            author : { 
+          _.extend(props, {
+            author : {
               name  : props.authorName,
               email : props.authorEmail,
               url   : props.authorUrl
@@ -511,7 +532,7 @@ module.exports = generators.Base.extend({
           message     : 'What is your application name ?',
           validate    : function (input) {
             // default statement
-            return !_.isEmpty(input) ? true : 'Please enter a valid application name.'
+            return !_.isEmpty(input) ? true : 'Please enter a valid application name.';
           }
         },
         {
@@ -533,7 +554,7 @@ module.exports = generators.Base.extend({
         }
 
         // default obj to use if nodeja app is not defined
-        var defaultObj = _.flatten([ baseObj, 
+        var defaultObj = _.flatten([ baseObj,
         {
           name        : 'version',
           message     : 'What is your application version (x.x.x) ?',
@@ -573,7 +594,7 @@ module.exports = generators.Base.extend({
         },
         {
           name        : 'authorUrl',
-          message     : 'What is the author url for this app ?',
+          message     : 'What is the author url for this app (Optional) ?',
           validate    : function (input) {
             // default statement
             return _.isEmpty(input) ? true : (isUrl(input) ? true : 'Please enter a valid url');
@@ -586,7 +607,7 @@ module.exports = generators.Base.extend({
           _.each(defaultObj, function (obj) {
             // add item
             prompts.push(obj);
-          })
+          });
         }
 
         // add default choices of angular app
@@ -598,48 +619,43 @@ module.exports = generators.Base.extend({
           default : this.cfg.angular.resolution
         });
 
-        // empty prompts ?
-        if (!_.isEmpty(prompts)) {
-          // process prompting
-          this.prompt(prompts, function (props) {
+        // process prompting
+        this.prompt(prompts, function (props) {
 
-            // process name
-            props.name = _.deburr(_.snakeCase(props.name)).replace('_', '-');
+          // process name
+          props.name = _.deburr(_.snakeCase(props.name)).replace('_', '-');
 
-            // normalize author
-            _.extend(props, { 
-              author      : { 
-                name  : props.authorName,
-                email : props.authorEmail,
-                url   : props.authorUrl
-              },
-              resolutions : {
-                angular : props.angularVersions
-              }
-            });
+          // normalize author
+          _.extend(props, {
+            author      : {
+              name  : props.authorName,
+              email : props.authorEmail,
+              url   : props.authorUrl
+            },
+            resolutions : {
+              angular : props.angularVersions
+            }
+          });
 
-            // delete non needed data
-            delete props.authorName;
-            delete props.authorEmail;
-            delete props.authorUrl;
-            delete props.angularVersions;
+          // delete non needed data
+          delete props.authorName;
+          delete props.authorEmail;
+          delete props.authorUrl;
+          delete props.angularVersions;
 
-            // extend object
-            this.angular = _.extend({}, props);
-
-            // end process
-            done();
-          }.bind(this));
-        } else {
-          // assign data
-          this.angular = _.clone(this.node);
-          // remove non needed data
-          delete this.angular.engines;
-          // message
-          this.info('We are using your nodejs configuration for your angular configuration.');
+          // extend object
+          this.angular = _.extend({}, props);
+          // node exits ?
+          if (this.node) {
+            var n = _.clone(this.node);
+            // remove non needed data
+            delete n.engines;
+            // merge data
+            this.angular = _.merge(this.angular, n);
+          }
           // end process
           done();
-        } 
+        }.bind(this));
       }
     },
     /**
@@ -684,12 +700,19 @@ module.exports = generators.Base.extend({
         type    : 'confirm',
         default : true,
         message : [ 'Do confirm that you allow us to remove existing',
-                    'directory structure if exists ?' ].join(' ')
+                    'directory structure if exists ?',
+                    chalk.red('(You must say Yes to continue)') ].join(' '),
       } ], function (props) {
-        // extend config with confirm ?
-        _.extend(this.cfg, { erase : props.erase });
-        // end process
-        done();
+        // is ok
+        if (props.erase) {
+          // extend config with confirm ?
+          _.extend(this.cfg, { erase : props.erase });
+          // end process
+          done();
+        } else {
+          // exit
+          process.exit(this.cfg.codes.eManual);
+        }
       }.bind(this));
     },
     /**
@@ -706,15 +729,19 @@ module.exports = generators.Base.extend({
           name    : 'eraseConfirm',
           type    : 'confirm',
           default : false,
-          message : chalk.yellow('Do you confirm your previous action ?')
+          message : [ chalk.yellow('Do you confirm your previous action ?'),
+                      chalk.red('(You must say Yes to continue)') ].join(' ')
         }], function (props) {
           // erase ?
-          if (this.cfg.erase) {
+          if (props.eraseConfirm) {
             // extend config with confirm ?
             this.cfg.erase = props.eraseConfirm;
+            // end process
+            done();
+          } else {
+            // exit
+            process.exit(this.cfg.codes.eManual);
           }
-          // end process
-          done();
         }.bind(this));
       } else {
         // end process
@@ -753,7 +780,7 @@ module.exports = generators.Base.extend({
         }, this);
 
         // extend structure
-        _.extend(this.cfg.structure, { directory : structure } );
+        _.extend(this.cfg.structure, { directory : structure });
       }
     },
     /**
@@ -775,7 +802,7 @@ module.exports = generators.Base.extend({
             name    : 'nDependencies',
             type    : 'checkbox',
             message : [ 'Choosed extra', type,
-                        'for your NodeJs application (optionnal) :' ].join(' '),
+                        'for your NodeJs application (Optional) :' ].join(' '),
             choices : this.dependencies.extra.node[type]
           });
         }
@@ -786,7 +813,7 @@ module.exports = generators.Base.extend({
             name    : 'aDependencies',
             type    : 'checkbox',
             message : [ 'Choosed extra', type,
-                        'for your AngularJs application (optionnal) :' ].join(' '),
+                        'for your AngularJs application (Optional) :' ].join(' '),
             choices : this.dependencies.extra.angular[type]
           });
         }
@@ -827,7 +854,7 @@ module.exports = generators.Base.extend({
   /**
    * Writing process
    */
-  writing   : {
+  writing       : {
     /**
      * Default coffee message
      */
@@ -840,6 +867,8 @@ module.exports = generators.Base.extend({
       this.spinner.start();
       // start a timeout here
       var timeout = setTimeout(function () {
+        // clear timeout
+        clearTimeout(timeout);
         // stop spinner
         this.spinner.stop(true);
         // next process
@@ -899,7 +928,7 @@ module.exports = generators.Base.extend({
 
         // default config auto process
         var config = {
-          node : {
+          node    : {
             template  : {
               source      : '_package.json',
               destination : 'package.json'
@@ -931,10 +960,9 @@ module.exports = generators.Base.extend({
             // file exists ?
             fs.stat(this.prefixPath(current.template.destination), function (err) {
               if (err) {
-                // write file 
-                fs.writeJson(this.prefixPath(current.template.destination),
-                             this[type], function (err) {
-
+                // write file
+                fs.writeJson(this.prefixPath(current.template.destination), this[type],
+                function (err) {
                   // has no error ?
                   if (!err) {
                     // start a timeout here
@@ -1153,11 +1181,32 @@ module.exports = generators.Base.extend({
           // start spinner
           this.spinner.start();
           // current path
-          var p = this.normalizePath([ this.sourceRoot(), 'applications', type, '/' ].join('/'));
+          var p = this.normalizePath([ this.sourceRoot(), 'applications', type ].join('/'));
           // walk on directory
           fs.walk(p).on('data', function (item) {
-            if (path.dirname(item.path) === p) {
-              console.log(item);
+            // is file ????
+            if (item.stats.isFile()) {
+              // remove path on file to process next normalize action
+              var nFile = item.path.replace(p, '');
+
+              // is a valid ext ?
+              if (!_.isEmpty(path.extname(nFile))) {
+                // process file normalization
+                nFile = this.prefixPath([
+                  (type === 'angular' ? 'public/assets/js/src' : ''),
+                  nFile
+                ].join('/'));
+
+                // replace _ before name file
+                nFile = nFile.replace(/\/_/, '/');
+
+                // map name
+                var content = fs.readFileSync(item.path).toString();
+                content = content.replace(/<%= name %>/g, this[type].name);
+
+                // write file
+                fs.outputFile(nFile, content);
+              }
             }
           }.bind(this))
           .on('end', function () {
@@ -1168,7 +1217,8 @@ module.exports = generators.Base.extend({
               // stop spinner
               this.spinner.stop(true);
               // message
-              this.info([ 'Files was generated for :', type ].join(' '));
+              this.info([ 'Files was properly generated for your', type,
+                          'application.' ].join(' '));
               // next process
               next();
             }.bind(this), this.cfg.delay);
@@ -1185,13 +1235,11 @@ module.exports = generators.Base.extend({
   /**
    * Install process
    */
-  install   : {
+  install       : {
     /**
      * Install node dependencies
      */
     packages : function () {
-      // start spinner
-      this.spinner.start();
       // banner message
       this.banner('We will install needed packages');
       // process install for each type
@@ -1207,36 +1255,15 @@ module.exports = generators.Base.extend({
           // normal item ?
           if (!_.isEmpty(nDev)) {
             // install
-            this[method](nDev, {  save : true }, function () {
+            this[method](nDev, { save : true }, function () {
               // have save dev ?
               if (!_.isEmpty(dev)) {
-                this[method](dev, {  saveDev : true }, function () {
-                  done();
-                });
+                this[method](dev, { saveDev : true });
               }
             }.bind(this));
           }
         }
       }.bind(this));
     }
-  },
-  end         : {
-    /**
-     * Default clean funtion at the end of queue process
-     */
-    clean   : function () {
-      console.log('al');
-      // stop spinner
-      this.spinner.stop(true);
-    }
   }
 });
-
-
-
-
-
-
-
-
-
