@@ -1,0 +1,15 @@
+{
+  "config" : "./config",
+  "env" : {
+    "development" : {
+      "logger" : {
+        "rotate" : {
+          "path" : "./logs",
+          "name" : "<%= name %>"
+        }
+      }
+    },
+    "staging" : {}, 
+    "production" : {}
+  }
+}

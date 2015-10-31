@@ -51,13 +51,14 @@ module.exports = generators.Base.extend({
         resolution  : 'latest',
         versions    : [ 'latest' ]
       },
+      delay       : 2000,
       name        : 'Yocto Stack generator',
       nVersions   : n.ls(),
       debug       : true,
       paths       : {
-        dependencies  : './config/dependencies.json',
-        folders       : './config/folders.json',
-        grunt         : './config/gruntfile.json'
+        dependencies  : [ this.sourceRoot(), 'config/dependencies.json' ].join('/'),
+        folders       : [ this.sourceRoot(), 'config/folders.json' ].join('/'),
+        grunt         : [ this.sourceRoot(), 'config/gruntfile.json' ].join('/')
       },
       generate    : {
         node    : false,
@@ -92,7 +93,8 @@ module.exports = generators.Base.extend({
       exit = _.isBoolean(exit) ? exit : false;
 
       // normalize path
-      var p = this.normalizePath([ [ './app/ascii', name ].join('/'), 'txt' ].join('.'));
+      var p = this.normalizePath([ [ this.sourceRoot() , 'ascii', name ].join('/'),
+                                   'txt' ].join('.'));
 
       // file exists 
       if (this.fs.exists(p)) {
@@ -126,7 +128,7 @@ module.exports = generators.Base.extend({
      */
     this.normalizePath = function (p) {
       // default statement
-      return path.normalize([ process.cwd(), p ].join('/'));
+      return path.normalize(p);
     };
 
     /**
@@ -139,10 +141,11 @@ module.exports = generators.Base.extend({
       // is debug ?
       if (this.cfg.debug) {
         // normalize process
-        return this.normalizePath([ '/debug', path ].join('/'));
+        return this.normalizePath([ this.destinationRoot(), '/debug', path ].join('/'));
       }
+
       // default statement
-      return path;
+      return this.normalizePath([ this.destinationRoot(), path ].join('/'));
     };
 
     /**
@@ -366,7 +369,7 @@ module.exports = generators.Base.extend({
     /**
      * Process node package configuration choices
      */
-    nodeBasePackage               : function () {
+    nodeBasePackage                   : function () {
       // process node package ?
       if (this.cfg.generate.node) {
         // banner message
@@ -455,13 +458,15 @@ module.exports = generators.Base.extend({
           type        : 'list',
           message     : 'Which version of node your application must depend ?',
           choices     : _(this.cfg.nVersions).reverse().value(),
-          default     : _.first(this.cfg.nVersions)
+          default     : n.current()
         } ]);
 
         // process prompting
         this.prompt(prompts, function (props) {
           // format engines process
-          props.engines = { node : props.engines };
+          props.engines = { node : [ '>=', props.engines ].join('') };
+          // process name
+          props.name = _.deburr(_.snakeCase(props.name)).replace('_', '-');
 
           // normalize author
           _.extend(props, { 
@@ -488,7 +493,7 @@ module.exports = generators.Base.extend({
     /**
      * Process bower package configuration choices
      */
-    bowerBasePackage              : function () {
+    bowerBasePackage                  : function () {
       // process node package ?
       if (this.cfg.generate.angular) {
         // banner message
@@ -584,24 +589,41 @@ module.exports = generators.Base.extend({
           })
         }
 
+        // add default choices of angular app
+        prompts.push({
+          name    : 'angularVersions',
+          type    : 'list',
+          message : 'Which version of angular your app must depend ?',
+          choices : this.cfg.angular.versions,
+          default : this.cfg.angular.resolution
+        });
+
+        // empty prompts ?
         if (!_.isEmpty(prompts)) {
           // process prompting
           this.prompt(prompts, function (props) {
-  
+
+            // process name
+            props.name = _.deburr(_.snakeCase(props.name)).replace('_', '-');
+
             // normalize author
             _.extend(props, { 
-              author : { 
+              author      : { 
                 name  : props.authorName,
                 email : props.authorEmail,
                 url   : props.authorUrl
+              },
+              resolutions : {
+                angular : props.angularVersions
               }
             });
-  
+
             // delete non needed data
             delete props.authorName;
             delete props.authorEmail;
             delete props.authorUrl;
-  
+            delete props.angularVersions;
+
             // extend object
             this.angular = _.extend({}, props);
 
@@ -623,7 +645,7 @@ module.exports = generators.Base.extend({
     /**
      * Process choice for structure generation
      */
-    generateFolders               : function () {
+    generateFolders                   : function () {
       // create async process
       var done    = this.async();
       // banner message
@@ -649,7 +671,7 @@ module.exports = generators.Base.extend({
     /**
      * Process choice for structure generation
      */
-    forceRemoveExistingFolders    : function () {
+    forceRemoveExistingFolders        : function () {
       // create async process
       var done    = this.async();
       // banner message
@@ -660,21 +682,44 @@ module.exports = generators.Base.extend({
       this.prompt([ {
         name    : 'erase',
         type    : 'confirm',
-        default : false,
+        default : true,
         message : [ 'Do confirm that you allow us to remove existing',
                     'directory structure if exists ?' ].join(' ')
-      },
-      {
-        name    : 'eraseConfirm',
-        type    : 'confirm',
-        default : false,
-        message : chalk.yellow('Do you confirm your previous action ?')
-      }], function (props) {
-        // extend config
-        _.extend(this.cfg, { erase : props.erase === props.eraseConfirm });
+      } ], function (props) {
+        // extend config with confirm ?
+        _.extend(this.cfg, { erase : props.erase });
         // end process
         done();
       }.bind(this));
+    },
+    /**
+     * Confirm erase existing folders ?
+     */
+    confirmForceRemoveExistingFolders : function () {
+      // create async process
+      var done    = this.async();
+
+      // erase ?
+      if (this.cfg.erase) {
+        // list of prompts
+        this.prompt([ {
+          name    : 'eraseConfirm',
+          type    : 'confirm',
+          default : false,
+          message : chalk.yellow('Do you confirm your previous action ?')
+        }], function (props) {
+          // erase ?
+          if (this.cfg.erase) {
+            // extend config with confirm ?
+            this.cfg.erase = props.eraseConfirm;
+          }
+          // end process
+          done();
+        }.bind(this));
+      } else {
+        // end process
+        done();
+      }
     }
   },
   /**
@@ -754,15 +799,17 @@ module.exports = generators.Base.extend({
             // node ?
             if (this.cfg.generate.node) {
               // change dependencies for ndoe
-              this.dependencies.node[type] = _.flatten([ this.dependencies.node[type],
-                                                         props.nDependencies ]);
+              this.dependencies.node[type] = _.compact(
+                                                _.flatten([ this.dependencies.node[type],
+                                                            props.nDependencies ]));
             }
 
             // angular ?
             if (this.cfg.generate.angular) {
               // change dependencies for angular
-              this.dependencies.angular[type] = _.flatten([ this.dependencies.angular[type],
-                                                            props.nDependencies ]);
+              this.dependencies.angular[type] = _.compact(
+                                                  _.flatten([ this.dependencies.angular[type],
+                                                              props.aDependencies ]));
             }
             // next process
             next();
@@ -797,7 +844,7 @@ module.exports = generators.Base.extend({
         this.spinner.stop(true);
         // next process
         done();
-      }.bind(this), 2000);
+      }.bind(this), this.cfg.delay);
     },
     /**
      * Deleting existing file
@@ -827,7 +874,7 @@ module.exports = generators.Base.extend({
               this.info('Your project directory was cleaned. Processing next step.');
               // end async
               done();
-            }.bind(this), 2000);
+            }.bind(this), this.cfg.delay);
           } else {
             // message
             this.error([ 'Cannot clean your directory :', err ].join(' '));
@@ -835,6 +882,9 @@ module.exports = generators.Base.extend({
             process.exit(this.cfg.codes.dFailed);
           }
         }.bind(this));
+      } else {
+        // end async
+        done();
       }
     },
     /**
@@ -879,50 +929,55 @@ module.exports = generators.Base.extend({
             // start spinner
             this.spinner.start();
             // file exists ?
-            if (!this.fs.exists(this.prefixPath(current.template.destination))) {
-              // write file 
-              fs.writeJson(this.prefixPath(current.template.destination),
-                           this[type], function (err) {
+            fs.stat(this.prefixPath(current.template.destination), function (err) {
+              if (err) {
+                // write file 
+                fs.writeJson(this.prefixPath(current.template.destination),
+                             this[type], function (err) {
 
-                // has no error ?
-                if (!err) {
-                  // start a timeout here
-                  var timeout = setTimeout(function () {
-                    // stop spinner
-                    this.spinner.stop(true);
-                    // clear timeout
-                    clearTimeout(timeout);
+                  // has no error ?
+                  if (!err) {
+                    // start a timeout here
+                    var timeout = setTimeout(function () {
+                      // stop spinner
+                      this.spinner.stop(true);
+                      // clear timeout
+                      clearTimeout(timeout);
+                      // success message
+                      this.info([ 'File', current.template.destination,
+                                  'was correctly created & builded.' ].join(' '));
+                      // next process
+                      next();
+                    }.bind(this), this.cfg.delay);
+                  } else {
                     // success message
-                    this.info([ 'File', current.template.destination,
-                                'was correctly created & builded.' ].join(' '));
-                    // next process
-                    next();
-                  }.bind(this), 2000);
-                } else {
-                  // success message
-                  this.error([ 'Cannot create', current.template.destination,
-                              'file :', err ].join(' '));
-                  // exit cannot continue
-                  process.exit(this.cfg.codes.fFailed);
-                }
-              }.bind(this));
-            } else {
-              // start a timeout here
-              var timeout = setTimeout(function () {
-                // stop spinner
-                this.spinner.stop(true);
-                // clear timeout
-                clearTimeout(timeout);
-                // error message
-                this.error([ [ 'Cannot create & build file',
-                               current.template.destination ].join(' '),
-                               '. this file must be remove first'
-                             ].join('')
-                          );
-                // next process
-                next();
-              }.bind(this), 2000);
-            }
+                    this.error([ 'Cannot create', current.template.destination,
+                                'file :', err ].join(' '));
+                    // exit cannot continue
+                    process.exit(this.cfg.codes.fFailed);
+                  }
+                }.bind(this));
+              } else {
+                // start a timeout here
+                var timeout = setTimeout(function () {
+                  // stop spinner
+                  this.spinner.stop(true);
+                  // clear timeout
+                  clearTimeout(timeout);
+                  // error message
+                  this.error([ [ 'Cannot create & build file',
+                                 current.template.destination ].join(' '),
+                                 '. this file must be remove first'
+                               ].join('')
+                            );
+                  // next process
+                  next();
+                }.bind(this), this.cfg.delay);
+              }
+            }.bind(this));
+          } else {
+            // next process
+            next();
           }
         } else {
           // set error
@@ -983,7 +1038,7 @@ module.exports = generators.Base.extend({
                                     'configuration was created.' ].join(' '));
                         // next process
                         next();
-                      }.bind(this), 2000);
+                      }.bind(this), this.cfg.delay);
                     } else {
                       // process next folder
                       nextFolder();
@@ -1000,6 +1055,9 @@ module.exports = generators.Base.extend({
                 }.bind(this));
               }.bind(this));
             }
+          } else {
+            // next process
+            next();
           }
         } else {
           // set error
@@ -1058,6 +1116,8 @@ module.exports = generators.Base.extend({
           fs.writeFile(this.prefixPath('Gruntfile.js'), content, function (err) {
             // start a timeout here
             var timeout = setTimeout(function () {
+              // clear timeout
+              clearTimeout(timeout);
               // stop spinner
               this.spinner.stop(true);
               // err ?
@@ -1072,12 +1132,104 @@ module.exports = generators.Base.extend({
                 // exit cannot continue
                 process.exit(this.cfg.codes.gFailed);
               }
-            }.bind(this), 2000);
+            }.bind(this), this.cfg.delay);
           }.bind(this));
         }.bind(this));
       }.bind(this));
+    },
+    /**
+     * Generate files
+     */
+    generateFiles       : function () {
+      // create async process
+      var done = this.async();
+
+      // start an async process
+      async.eachSeries([ 'node', 'angular' ], function (type, next) {
+        // generate this app ?
+        if (this.cfg.generate[type]) {
+          // banner message
+          this.banner([ 'We will generate base files for your', type, 'application' ].join(' '));
+          // start spinner
+          this.spinner.start();
+          // current path
+          var p = this.normalizePath([ this.sourceRoot(), 'applications', type, '/' ].join('/'));
+          // walk on directory
+          fs.walk(p).on('data', function (item) {
+            if (path.dirname(item.path) === p) {
+              console.log(item);
+            }
+          }.bind(this))
+          .on('end', function () {
+            // start a timeout here
+            var timeout = setTimeout(function () {
+              // clear timeout
+              clearTimeout(timeout);
+              // stop spinner
+              this.spinner.stop(true);
+              // message
+              this.info([ 'Files was generated for :', type ].join(' '));
+              // next process
+              next();
+            }.bind(this), this.cfg.delay);
+          }.bind(this));
+        } else {
+          // next process
+          next();
+        }
+      }.bind(this), function () {
+        done();
+      });
     }
   },
+  /**
+   * Install process
+   */
+  install   : {
+    /**
+     * Install node dependencies
+     */
+    packages : function () {
+      // start spinner
+      this.spinner.start();
+      // banner message
+      this.banner('We will install needed packages');
+      // process install for each type
+      _.each([ 'node', 'angular'], function (type) {
+        // node ?
+        if (this.cfg.generate[type]) {
+          // no dev
+          var nDev    = this.dependencies[type].dependencies;
+          // dev
+          var dev     = this.dependencies[type].devDependencies;
+          // defined method
+          var method  = type === 'node' ? 'npmInstall' : 'bowerInstall';
+          // normal item ?
+          if (!_.isEmpty(nDev)) {
+            // install
+            this[method](nDev, {  save : true }, function () {
+              // have save dev ?
+              if (!_.isEmpty(dev)) {
+                this[method](dev, {  saveDev : true }, function () {
+                  done();
+                });
+              }
+            }.bind(this));
+          }
+        }
+      }.bind(this));
+    }
+  },
+  end         : {
+    /**
+     * Default clean funtion at the end of queue process
+     */
+    clean   : function () {
+      console.log('al');
+      // stop spinner
+      this.spinner.stop(true);
+    }
+  }
 });
 
 

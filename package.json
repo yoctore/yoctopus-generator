@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "description": " The Yocto Stack Generator is the component that permit you to install the Yocto Stack easily.",
   "scripts": {
-    "clean": "npm cache clean",
-    "postinstall": "npm link",
-    "reinstall": "npm run clean && npm install"
+    "preinstall" : "npm cache clean && npm install -g yo",
+    "postinstall": "npm link"
   },
   "homepage": "http://yocto.re",
   "author": {
@@ -19,8 +18,6 @@
     "node": ">=0.12.2"
   },
   "files": [
-    "index.js",
-    "documentation",
     "app"
   ],
   "dependencies": {

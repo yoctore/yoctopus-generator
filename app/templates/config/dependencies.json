@@ -15,6 +15,23 @@
   },
   "angular" : {
     "dependencies" : [
+      "jquery",
+      "bootstrap",
+      "angular",
+      "angular-messages",
+      "angular-local-storage",
+      "angular-touch",
+      "angular-media-queries",
+      "angular-password",
+      "angular-ui-router",
+      "angular-animate",
+      "moment",
+      "angular-translate",
+      "angular-sanitize",
+      "angular-route",
+      "angular-bootstrap",
+      "angular-ui-router",
+      "angulartics"
     ],
     "devDependencies" : [
     ]
@@ -31,7 +48,9 @@
         "yocto-mongoose"
       ],
       "devDependencies" : [
-        "grunt"
+        "grunt",
+        "grunt-contrib-cssmin",
+        "grunt-html2js"
       ]
     },
     "angular" : {
@@ -39,7 +58,6 @@
         "yocto-angular-jwt"
       ],
       "devDependencies" : [
-        "grunt-contrib-cssmin"
       ]
     }
   }

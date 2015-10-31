@@ -5,7 +5,8 @@
     "routes",
     "views",
     "config",
-    "documentation"
+    "documentation",
+    "logs"
   ],
   "angular" : [
     "private",
