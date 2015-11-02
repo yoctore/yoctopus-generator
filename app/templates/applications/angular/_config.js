@@ -59,7 +59,7 @@ angular.module('<%= name %>').config([ '$provide', function ($provide) {
  */
 angular.module('<%= name %>').config( [ 'translateProvider', function ($translateProvider) {
   // Define language
-  $translateProvider.translations('en' {
+  $translateProvider.translations('en', {
     // Our translations will go in here
   }).translations('fr', {
     // Our translations will go in here

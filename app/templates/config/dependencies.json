@@ -32,10 +32,20 @@
       "angulartics",
       "angular-media-queries",
       "angular-translate",
-      "moment"
+      "moment",
+      "components-font-awesome"
     ],
     "devDependencies" : [
-    ]
+
+    ],
+    "node" : {
+      "devDependencies" : [
+        "grunt",
+        "grunt-contrib-uglify",
+        "grunt-ng-annotate",
+        "grunt-contrib-concat"
+      ]
+    }
   },
   "extra" : {
     "node" : {
@@ -45,18 +55,19 @@
         "q",
         "async",
         "lodash",
-        "less",
+        "express-less",
         "yocto-mongoose"
       ],
       "devDependencies" : [
-        "grunt",
         "grunt-contrib-cssmin",
-        "grunt-html2js"
+        "grunt-html2js",
+        "grunt-contrib-less"
       ]
     },
     "angular" : {
       "dependencies" : [
-        "yocto-angular-jwt"
+        "yocto-angular-jwt",
+        "crypto-js"
       ],
       "devDependencies" : [
       ]

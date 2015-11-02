@@ -1,7 +1,7 @@
 'use strict';
 
 // tricks for hinter
-var jsbeautyKey     = 'js_beauty';
+var jsbeautyKey     = 'js_beautify';
 // dependencies
 var generators      = require('yeoman-generator');
 var _               = require('lodash');
@@ -42,7 +42,6 @@ module.exports = generators.Base.extend({
      * Default spinner instance
      */
     this.spinner      = new Spinner('%s');
-
     /**
      * Default internal config
      *
@@ -80,12 +79,6 @@ module.exports = generators.Base.extend({
         welcome   : 'welcome'
       }
     };
-
-    process.on('exit', function (code) {
-      if (code === 1) {
-      }
-      console.log('TODO HERE yoctopus ascii art');
-    }.bind(this));
 
     /**
      * Default ascii method to display content to ascii
@@ -129,7 +122,6 @@ module.exports = generators.Base.extend({
         process.exit(this.cfg.codes.eManual);
       }
     };
-
     /**
      * Utility method to normalize given
      *
@@ -140,7 +132,6 @@ module.exports = generators.Base.extend({
       // default statement
       return path.normalize(p);
     };
-
     /**
      * Utility method to prefix path for debug mode
      *
@@ -157,7 +148,6 @@ module.exports = generators.Base.extend({
       // default statement
       return this.normalizePath([ this.destinationRoot(), path ].join('/'));
     };
-
     /**
      * Return elasped time label
      *
@@ -178,17 +168,14 @@ module.exports = generators.Base.extend({
       // build items
       return !_.isEmpty(t) ? _.compact([ '(Time elapsed : ', [ t ].join(''), ')' ]).join('') : '';
     };
-
     /**
      * Default utility method to display a banner message
      *
      * @param {String} message message to display
      */
     this.banner = function (message) {
-      // get elasped time
-      var t = this.getElapsedTime();
       // process banner
-      logger.banner([ '[', this.cfg.name, '] -', message, t ].join(' '));
+      logger.banner([ '[', this.cfg.name, '] -', message].join(' '));
     };
     /**
      * Default utility method to log message on generator
@@ -211,7 +198,6 @@ module.exports = generators.Base.extend({
       // default proess
       this.logger('red', message);
     };
-
     /**
      * Default utility method for warning message
      *
@@ -221,7 +207,6 @@ module.exports = generators.Base.extend({
       // default proess
       this.logger('yellow', message);
     };
-
     /**
      * Default utility method for warning message
      *
@@ -236,6 +221,22 @@ module.exports = generators.Base.extend({
    * Initializing part
    */
   initializing  : {
+    /**
+     * Catch exit method
+     */
+    catchExit     : function () {
+      // We need to catch exit error 
+      process.on('exit', function (code) {
+        // error code ?
+        if (code >= this.cfg.codes.dFailed && code <= code >= this.cfg.codes.gFailed) {
+          // ascii message
+          this.asciiMessage('octopus-error');
+        } else {
+          // ascii Message
+          this.asciiMessage('goodbye');
+        }
+      }.bind(this));
+    },
     /**
      * Default banner
      */
@@ -348,6 +349,13 @@ module.exports = generators.Base.extend({
           // message
           this.info('Retreive angular version succeed.');
           // end process
+          done();
+        } else {
+          // stop spinner
+          this.spinner.stop(true);
+          // error message
+          this.error([ 'Cannot retreive angular version :', error].join(' '));
+          // done
           done();
         }
       }.bind(this));
@@ -701,7 +709,7 @@ module.exports = generators.Base.extend({
         default : true,
         message : [ 'Do confirm that you allow us to remove existing',
                     'directory structure if exists ?',
-                    chalk.red('(You must say Yes to continue)') ].join(' '),
+                    chalk.red('(Yes to continue)') ].join(' '),
       } ], function (props) {
         // is ok
         if (props.erase) {
@@ -730,7 +738,7 @@ module.exports = generators.Base.extend({
           type    : 'confirm',
           default : false,
           message : [ chalk.yellow('Do you confirm your previous action ?'),
-                      chalk.red('(You must say Yes to continue)') ].join(' ')
+                      chalk.red('(Yes to continue)') ].join(' ')
         }], function (props) {
           // erase ?
           if (props.eraseConfirm) {
@@ -1103,7 +1111,11 @@ module.exports = generators.Base.extend({
      */
     generateGruntFile   : function () {
       // create async process
-      var done        = this.async();
+      var done = this.async();
+      // default config array
+      var list = {};
+      // default list
+      var registerList = {};
 
       // banner message
       this.banner('We will generate your Gruntfile.js configuration');
@@ -1111,57 +1123,118 @@ module.exports = generators.Base.extend({
       // start spinner
       this.spinner.start();
       // reach each config
-      async.eachSeries(this.gruntConfig.config, function (config, next) {
-        // normalize
-        var c = config.value.join(',');
-        // pkg property ?
-        if (config.name !== 'pkg') {
-          c = [ '{', c, '}' ].join(' ');
-        }
+      async.eachSeries([ 'default', 'node', 'angular' ], function (type, next) {
 
-        // is empty ?
-        if (!_.isEmpty(c)) {
-          // add config
-          this.gruntEditor.insertConfig(config.name, c);
-        }
-        // insert new gruntfile configuration
-        next();
-      }.bind(this), function () {
-        // reach load
-        this.gruntEditor.loadNpmTasks(this.gruntConfig.load);
-        // reach register
-        async.eachSeries(this.gruntConfig.register, function (register, next) {
-          // register task
-          this.gruntEditor.registerTask(register.name, register.description, register.value);
-          // next item
-          next();
-        }.bind(this) , function () {
-          // beautidy content
-          var content = jsbeauty(this.gruntEditor.toString(), { 'indent_size' : 2 });
-          // replace some brakets and ":"
-          content = content.replace(/\[/g, '[ ').replace(/\]/g, ' ]').replace(/(a-zA-Z)?:/g, ' :');
-          // write file
-          fs.writeFile(this.prefixPath('Gruntfile.js'), content, function (err) {
-            // start a timeout here
-            var timeout = setTimeout(function () {
-              // clear timeout
-              clearTimeout(timeout);
-              // stop spinner
-              this.spinner.stop(true);
-              // err ?
-              if (!err) {
-                // message
-                this.info('Your Gruntfile.js was correctly created.');
-                // end
-                done();
-              } else {
-                // error message
-                this.error([ 'Cannnot generate Gruntfile.js :', err ].join(' '));
-                // exit cannot continue
-                process.exit(this.cfg.codes.gFailed);
+        // default 
+        var tconfig = this.gruntConfig.config[type];
+        // async each config
+        async.eachSeries(tconfig, function (config, tnext) {
+          // parse each item
+          async.eachSeries(config.value, function (c, cnext) {
+            // is empty ?
+            if (!_.isEmpty(c)) {
+              // temp key
+              var k = [ config.name, '_key' ].join('');
+              // add config
+              
+              if (_.isUndefined(list[k])) {
+                _.set(list, k, []);
               }
-            }.bind(this), this.cfg.delay);
-          }.bind(this));
+
+              // default push
+              list[k].push(c);
+              cnext();
+            }
+          }.bind(this), function() {
+            // next
+            tnext();
+          }.bind(this))
+        }.bind(this), function() {
+          // is empty ?
+          if (!_.isEmpty(this.gruntConfig.load[type])) {
+            // reach load
+            this.gruntEditor.loadNpmTasks(this.gruntConfig.load[type]);
+          }
+
+          // each register
+          async.eachSeries(this.gruntConfig.register[type], function (register, rnext) {
+            // register task
+            //this.gruntEditor.registerTask(register.name, register.description, register.value);
+            if (_.isUndefined(registerList[register.name])) {
+              // default list
+              registerList[register.name] = {
+                name        : [],
+                description : [],
+                value       : []
+              };
+            }
+            // list register
+            registerList[register.name].name.push(register.name);
+            registerList[register.name].description.push(register.description);
+            registerList[register.name].value.push(register.value);
+            // next item
+            rnext();
+          }.bind(this) , function () {
+            // next process
+            next();
+          });
+        }.bind(this));
+      }.bind(this), function () {
+
+        // build each register
+        _.each(registerList, function (list) {
+          // sort value
+          var value = _.sortBy(_.flatten(_.uniq(list.value)), function (i) {
+            // default statement
+            return [ i !== 'buildjs', i !== 'build', i ].join('|');
+          });
+
+          // register task
+          this.gruntEditor.registerTask(_.uniq(list.name).join(' - '),
+                                        _.uniq(list.description).join(' - '), value);
+        }, this);
+
+        // parse list
+        _.each(list, function (item, key) {
+          // noramlizekey
+          var pkey = key.replace('_key', '');
+          // default item
+          item = item.join(', ')
+          // pkg property ?
+          if (pkey !== 'pkg') {
+            // process
+            item = [ '{', item , '}' ].join(' ');
+          }
+
+          // add config
+          this.gruntEditor.insertConfig(pkey, item);
+        }, this);
+        
+        // beautidy content
+        var content = jsbeauty(this.gruntEditor.toString(), { 'indent_size' : 2 });
+        // replace some brakets and ":"
+        content = content.replace(/\[/g, '[ ').replace(/\]/g, ' ]');
+        // write file
+        fs.writeFile(this.prefixPath('Gruntfile.js'), content, function (err) {
+          // start a timeout here
+          var timeout = setTimeout(function () {
+            // clear timeout
+            clearTimeout(timeout);
+            // stop spinner
+            this.spinner.stop(true);
+            // err ?
+            if (!err) {
+              // message
+              this.info('Your Gruntfile.js was correctly created.');
+              // end
+              done();
+            } else {
+              // error message
+              this.error([ 'Cannnot generate Gruntfile.js :', err ].join(' '));
+              // exit cannot continue
+              process.exit(this.cfg.codes.gFailed);
+            }
+          }.bind(this), this.cfg.delay);
         }.bind(this));
       }.bind(this));
     },
@@ -1172,12 +1245,20 @@ module.exports = generators.Base.extend({
       // create async process
       var done = this.async();
 
+      // types list
+      var types = [ 'node', 'angular', 'default' ];
+this.cfg.opensource = true;
+      if (this.cfg.opensource) {
+        // push open source dans la queue
+        types.push('open-source');
+      };
+
       // start an async process
-      async.eachSeries([ 'node', 'angular' ], function (type, next) {
+      async.eachSeries(types, function (type, next) {
         // generate this app ?
-        if (this.cfg.generate[type]) {
+        if (this.cfg.generate[type] || type === 'default' || type === 'open-source') {
           // banner message
-          this.banner([ 'We will generate base files for your', type, 'application' ].join(' '));
+          this.banner([ 'We will generate base files for your', type, 'configuration' ].join(' '));
           // start spinner
           this.spinner.start();
           // current path
@@ -1188,9 +1269,9 @@ module.exports = generators.Base.extend({
             if (item.stats.isFile()) {
               // remove path on file to process next normalize action
               var nFile = item.path.replace(p, '');
-
+console.log(p, path.extname(nFile));
               // is a valid ext ?
-              if (!_.isEmpty(path.extname(nFile))) {
+              if (!_.isEmpty(path.extname(nFile)) || type === 'default') {
                 // process file normalization
                 nFile = this.prefixPath([
                   (type === 'angular' ? 'public/assets/js/src' : ''),
@@ -1202,7 +1283,11 @@ module.exports = generators.Base.extend({
 
                 // map name
                 var content = fs.readFileSync(item.path).toString();
-                content = content.replace(/<%= name %>/g, this[type].name);
+
+                // has name ? if true replace
+                if (_.has(this[type], 'name')) {
+                  content = content.replace(/<%= name %>/g, this[type].name);
+                }
 
                 // write file
                 fs.outputFile(nFile, content);
@@ -1250,20 +1335,52 @@ module.exports = generators.Base.extend({
           var nDev    = this.dependencies[type].dependencies;
           // dev
           var dev     = this.dependencies[type].devDependencies;
+
           // defined method
           var method  = type === 'node' ? 'npmInstall' : 'bowerInstall';
+
           // normal item ?
           if (!_.isEmpty(nDev)) {
             // install
             this[method](nDev, { save : true }, function () {
-              // have save dev ?
-              if (!_.isEmpty(dev)) {
-                this[method](dev, { saveDev : true });
-              }
+              this.info([ 'Install', type, 'dependencies succeed.' ].join(' '));
             }.bind(this));
+          }
+
+          // have save dev ?
+          if (!_.isEmpty(dev)) {
+            // install 
+            this[method](dev, { saveDev : true }, function () {
+              this.info([ 'Install', type, 'dev dependencies succeed.' ].join(' '));
+            }.bind(this));
+          } 
+
+          // has extra dev dep ?
+          if (_.has(this.dependencies[type], 'node')) {
+            // is empty ?
+            if (!_.isEmpty(this.dependencies[type].node.devDependencies)) {
+              // install node dev for angular app
+              this.npmInstall(this.dependencies[type].node.devDependencies,
+                              { saveDev : true }, function () {
+                this.info([ 'Install', type, 'extra dev dependencies succeed.' ].join(' '));
+              }.bind(this));
+            }
           }
         }
       }.bind(this));
+    }
+  },
+  /**
+   * End process
+   */
+  end           : {
+    /**
+     * Process grunt generation rules for project init
+     */
+    processGrunt : function () {
+      // banner message
+      this.banner('We will process grunt task before ending.')
+      this.spawnCommand('grunt');
     }
   }
 });

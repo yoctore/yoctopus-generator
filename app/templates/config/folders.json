@@ -6,7 +6,8 @@
     "views",
     "config",
     "documentation",
-    "logs"
+    "logs",
+    "test"
   ],
   "angular" : [
     "private",
