@@ -1,6 +1,7 @@
 {
   "node" : {
     "dependencies" : [
+      "yocto-logger",
       "yocto-core-stack"
     ],
     "devDependencies" : [

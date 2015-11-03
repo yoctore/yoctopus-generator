@@ -9,7 +9,21 @@
         }
       }
     },
-    "staging" : {}, 
-    "production" : {}
+    "staging" : {
+      "logger" : {
+        "rotate" : {
+          "path" : "./logs",
+          "name" : "<%= name %>"
+        }
+      }
+    }, 
+    "production" : {
+      "logger" : {
+        "rotate" : {
+          "path" : "./logs",
+          "name" : "<%= name %>"
+        }
+      }
+    }
   }
 }

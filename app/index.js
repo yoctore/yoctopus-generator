@@ -1269,9 +1269,14 @@ this.cfg.opensource = true;
             if (item.stats.isFile()) {
               // remove path on file to process next normalize action
               var nFile = item.path.replace(p, '');
-console.log(p, path.extname(nFile));
+
+              // parse file
+              var parse = path.parse(item.path);
+
               // is a valid ext ?
-              if (!_.isEmpty(path.extname(nFile)) || type === 'default') {
+              if (!_.isEmpty(path.extname(nFile)) || (type === 'default' && 
+                (parse.base === '_.gitignore' || parse.base === '_.gitattributes'))) {
+
                 // process file normalization
                 nFile = this.prefixPath([
                   (type === 'angular' ? 'public/assets/js/src' : ''),
