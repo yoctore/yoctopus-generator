@@ -1,24 +1,48 @@
 {
-  "name": "generator-yoctopusjs",
-  "version": "0.1.0",
-  "description": " The Yocto Stack Generator is the component that permit you to install the Yocto Stack easily.",
-  "scripts": {
-    "preinstall": "npm cache clean && npm install -g yo",
-    "postinstall": "npm link"
+  "name": "generator-yoctopus",
+  "description": "Utility tools to build an yoctopus stack based on NodeJs / AngularJs",
+  "version": "1.0.0",
+  "scripts": {},
+  "author"  : {
+    "name"  : "Yocto SAS",
+    "email" : "technique@yocto.re",
+    "url"   : "http://www.yocto.re"
   },
-  "homepage": "http://yocto.re",
-  "author": {
-    "name": "The Yocto Team"
+  "contributors" : [
+    {
+      "name"  : "ROBERT Mathieu",
+      "email" : "mathieu@yocto.re"
+    }
+  ],
+  "maintainers" : [],
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=4.2.1"
   },
   "repository": {
     "type": "git",
-    "url": "http://lab.yocto.digital/yocto-tools/yocto-stack-generator"
+    "url": "https://gitlab.com/yocto-node-modules/yoctopus-generator.git"
   },
+  "bugs": {
+    "url": "https://gitlab.com/yocto-node-modules/yoctopus-generator/issues"
+  },
+
   "engines": {
-    "node": ">=0.12.2"
+    "node": ">=4.2.1"
   },
   "files": [
-    "app"
+    "app",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE-2.0.txt"
+  ],
+  "keywords": [
+    "tool",
+    "generator",
+    "angular",
+    "node",
+    "yocto",
+    "stack"
   ],
   "dependencies": {
     "async": "^1.5.0",
@@ -38,9 +62,9 @@
     "time": "^0.11.4",
     "uuid": "^2.0.1",
     "winston": "^1.0.0",
-    "yeoman-generator": "latest",
+    "yeoman-generator": "^0.21.1",
     "yocto-logger": "^1.1.0",
-    "yosay": "latest"
+    "yosay": "^1.0.5"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

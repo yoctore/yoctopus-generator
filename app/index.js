@@ -76,7 +76,9 @@ module.exports = generators.Base.extend({
         coffee    : 'coffee',
         debug     : 'debug-mode',
         bye       : 'goodbye',
-        welcome   : 'welcome'
+        welcome   : 'welcome',
+        error     : 'octopus-error',
+        file      : 'remove-file-required'
       }
     };
 
@@ -109,9 +111,19 @@ module.exports = generators.Base.extend({
           content = chalk.green(content);
         }
 
-        // is coffee ?
-        if (name === this.cfg.ascii.welcome) {
-          content = chalk.cyan(content);
+        // is welcome or bye ?
+        if (name === this.cfg.ascii.welcome || name === this.cfg.ascii.bye) {
+          content = chalk.cyan(content).replace('%s', this.getElapsedTime());
+        }
+
+        // is error ?
+        if (name === this.cfg.ascii.error) {
+          content = chalk.req(content);
+        }
+
+        // is file ?
+        if (name === this.cfg.ascii.file) {
+          content = chalk.yellow(content);
         }
 
         // log message
@@ -230,10 +242,10 @@ module.exports = generators.Base.extend({
         // error code ?
         if (code >= this.cfg.codes.dFailed && code <= code >= this.cfg.codes.gFailed) {
           // ascii message
-          this.asciiMessage('octopus-error');
+          this.asciiMessage(this.cfg.ascii.error);
         } else {
           // ascii Message
-          this.asciiMessage('goodbye');
+          this.asciiMessage(this.cfg.ascii.bye);
         }
       }.bind(this));
     },
@@ -257,7 +269,8 @@ module.exports = generators.Base.extend({
         type    : 'confirm',
         message : [ 'Do you want run this process in debug mode ?',
                    '(we will create and use debug directory for',
-                    'data generation process)' ].join(' ')
+                    'data generation process)' ].join(' '),
+        default : false
       }], function (props) {
         // enable debug mode
         this.cfg.debug = props.debug;
@@ -396,6 +409,29 @@ module.exports = generators.Base.extend({
    */
   prompting     : {
     /**
+     * Open source process ?
+     */
+    openSourceProject                 : function () {
+      // create an async process
+      var done = this.async();
+      // banner process
+      this.banner('Now tell us if this project will be open source in the future');
+
+      // process prompting
+      this.prompt([ {
+        name        : 'opensource',
+        type        : 'confirm',
+        message     : 'Your project will be open source ?',
+        default     : true
+      } ], function (props) {
+        // add answer
+        _.extend(this.cfg, props);
+        // end process
+        done();
+      }.bind(this));
+    },
+
+    /**
      * Process node package configuration choices
      */
     nodeBasePackage                   : function () {
@@ -451,7 +487,7 @@ module.exports = generators.Base.extend({
         {
           name        : 'private',
           type        : 'confirm',
-          message     : 'Your application is private ?'
+          message     : 'Your application is private ?',
         },
         {
           name        : 'license',
@@ -675,6 +711,7 @@ module.exports = generators.Base.extend({
       // banner message
       this.banner('So maybe you want to generate a file structure for your app');
 
+      // prompt process
       this.prompt([ {
         name    : 'structure',
         type    : 'confirm',
@@ -691,6 +728,13 @@ module.exports = generators.Base.extend({
         // end process
         done();
       }.bind(this));
+    },
+    /**
+     * A message to inform next process
+     */
+    infoRemoveFolder                  : function () {
+      // ascii message
+      this.asciiMessage(this.cfg.ascii.file);
     },
     /**
      * Process choice for structure generation
@@ -1209,7 +1253,7 @@ module.exports = generators.Base.extend({
           // add config
           this.gruntEditor.insertConfig(pkey, item);
         }, this);
-        
+
         // beautidy content
         var content = jsbeauty(this.gruntEditor.toString(), { 'indent_size' : 2 });
         // replace some brakets and ":"
@@ -1247,7 +1291,7 @@ module.exports = generators.Base.extend({
 
       // types list
       var types = [ 'node', 'angular', 'default' ];
-this.cfg.opensource = true;
+
       if (this.cfg.opensource) {
         // push open source dans la queue
         types.push('open-source');
