@@ -1015,6 +1015,11 @@ module.exports = generators.Base.extend({
                 // write file
                 fs.writeJson(this.prefixPath(current.template.destination), this[type],
                 function (err) {
+                  // need to force generation on package.json on angular only type
+                  if (type === 'angular') {
+                    // write
+                    fs.writeJson(this.prefixPath('package.json'), this[type]);
+                  }
                   // has no error ?
                   if (!err) {
                     // start a timeout here
