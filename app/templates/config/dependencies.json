@@ -44,7 +44,9 @@
         "grunt",
         "grunt-contrib-uglify",
         "grunt-ng-annotate",
-        "grunt-contrib-concat"
+        "grunt-contrib-concat",
+        "yocto-hint",
+        "grunt-mocha-cli"
       ]
     }
   },
