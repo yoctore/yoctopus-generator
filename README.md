@@ -20,7 +20,7 @@ We build this generator to gain time between each project. It provide for us :
 To install `yoctotopus`
 
 ```bash
-sudo npm install -g yo yoctopus bower grunt-cli
+sudo npm install -g yo generator-yoctopus bower grunt-cli
 ```
 
 To verify that the `yoctopus` generator is properly installed :
