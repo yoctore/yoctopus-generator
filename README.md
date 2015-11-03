@@ -4,7 +4,7 @@ This module is a part of yocto node modules for NodeJS.
 
 Please see [our NPM repository](https://www.npmjs.com/~yocto) for complete list of available tools (completed day after day).
 
-This generator build an **Yoctopus** *(Yes ou tools is a name of this tools ;) )* stack based on NodeJs / AngularJs and our [yocto modules](https://www.npmjs.com/~yocto).
+This generator build an **Yoctopus** *(Yes this is a name of our tools ;) )* stack based on NodeJs / AngularJs and our [yocto modules](https://www.npmjs.com/~yocto).
 
 ## Motivation
 
