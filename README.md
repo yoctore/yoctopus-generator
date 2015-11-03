@@ -23,12 +23,6 @@ To install `yoctotopus`
 sudo npm install -g yo yoctopus bower grunt-cli
 ```
 
-After that link `yoctopus`
-
-```bash
-sudo npm link
-```
-
 To verify that the `yoctopus` generator is properly installed :
 
 ```bash
