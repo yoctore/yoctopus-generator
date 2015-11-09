@@ -1,0 +1,43 @@
+[
+  {
+    "method"  : "get",
+    "path"    : "*",
+    "controller" : {
+      "name"  : "index",
+      "fn"  : "trace"
+    }
+  },
+  {
+    "method"  : "get",
+    "path"    : "/",
+    "controller" : {
+      "name"  : "index",
+      "fn"  : "index"
+    }
+  },
+  {
+    "method"  : "get",
+    "path"    : "/robots.txt",
+    "controller" : {
+      "name"  : "index",
+      "fn"  : "robots"
+    }
+  },
+  {
+    "method"  : "get",
+    "path"    : "/sitemap.xml",
+    "controller" : {
+      "name"  : "index",
+      "fn"  : "sitemap"
+    }
+  },
+  {
+    "method"  : "get",
+    "path": "/partials\/.*",
+    "regexp" : true,
+    "controller" : {
+      "name"  : "index",
+      "fn"  : "partials"
+    }
+  }
+]

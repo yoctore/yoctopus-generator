@@ -237,7 +237,7 @@ module.exports = generators.Base.extend({
      * Catch exit method
      */
     catchExit     : function () {
-      // We need to catch exit error 
+      // We need to catch exit error
       process.on('exit', function (code) {
         // error code ?
         if (code >= this.cfg.codes.dFailed && code <= code >= this.cfg.codes.gFailed) {
@@ -1174,7 +1174,7 @@ module.exports = generators.Base.extend({
       // reach each config
       async.eachSeries([ 'default', 'node', 'angular' ], function (type, next) {
 
-        // default 
+        // default
         var tconfig = this.gruntConfig.config[type];
         // async each config
         async.eachSeries(tconfig, function (config, tnext) {
@@ -1185,7 +1185,6 @@ module.exports = generators.Base.extend({
               // temp key
               var k = [ config.name, '_key' ].join('');
               // add config
-              
               if (_.isUndefined(list[k])) {
                 _.set(list, k, []);
               }
@@ -1194,11 +1193,11 @@ module.exports = generators.Base.extend({
               list[k].push(c);
               cnext();
             }
-          }.bind(this), function() {
+          }.bind(this), function () {
             // next
             tnext();
-          }.bind(this))
-        }.bind(this), function() {
+          }.bind(this));
+        }.bind(this), function () {
           // is empty ?
           if (!_.isEmpty(this.gruntConfig.load[type])) {
             // reach load
@@ -1208,7 +1207,6 @@ module.exports = generators.Base.extend({
           // each register
           async.eachSeries(this.gruntConfig.register[type], function (register, rnext) {
             // register task
-            //this.gruntEditor.registerTask(register.name, register.description, register.value);
             if (_.isUndefined(registerList[register.name])) {
               // default list
               registerList[register.name] = {
@@ -1248,7 +1246,7 @@ module.exports = generators.Base.extend({
           // noramlizekey
           var pkey = key.replace('_key', '');
           // default item
-          item = item.join(', ')
+          item = item.join(', ');
           // pkg property ?
           if (pkey !== 'pkg') {
             // process
@@ -1300,7 +1298,7 @@ module.exports = generators.Base.extend({
       if (this.cfg.opensource) {
         // push open source dans la queue
         types.push('open-source');
-      };
+      }
 
       // start an async process
       async.eachSeries(types, function (type, next) {
@@ -1312,6 +1310,7 @@ module.exports = generators.Base.extend({
           this.spinner.start();
           // current path
           var p = this.normalizePath([ this.sourceRoot(), 'applications', type ].join('/'));
+
           // walk on directory
           fs.walk(p).on('data', function (item) {
             // is file ????
@@ -1323,7 +1322,7 @@ module.exports = generators.Base.extend({
               var parse = path.parse(item.path);
 
               // is a valid ext ?
-              if (!_.isEmpty(path.extname(nFile)) || (type === 'default' && 
+              if (!_.isEmpty(path.extname(nFile)) || (type === 'default' &&
                 (parse.base === '_.gitignore' || parse.base === '_.gitattributes'))) {
 
                 // process file normalization
@@ -1403,11 +1402,11 @@ module.exports = generators.Base.extend({
 
           // have save dev ?
           if (!_.isEmpty(dev)) {
-            // install 
+            // install
             this[method](dev, { saveDev : true }, function () {
               this.info([ 'Install', type, 'dev dependencies succeed.' ].join(' '));
             }.bind(this));
-          } 
+          }
 
           // has extra dev dep ?
           if (_.has(this.dependencies[type], 'node')) {
@@ -1416,7 +1415,15 @@ module.exports = generators.Base.extend({
               // install node dev for angular app
               this.npmInstall(this.dependencies[type].node.devDependencies,
                               { saveDev : true }, function () {
-                this.info([ 'Install', type, 'extra dev dependencies succeed.' ].join(' '));
+                this.info([ 'Install', type, 'extra node dev dependencies succeed.' ].join(' '));
+              }.bind(this));
+            }
+            // is empty ?
+            if (!_.isEmpty(this.dependencies[type].node.dependencies)) {
+              // install node dev for angular app
+              this.npmInstall(this.dependencies[type].node.dependencies,
+                              { save : true }, function () {
+                this.info([ 'Install', type, 'extra node dependencies succeed.' ].join(' '));
               }.bind(this));
             }
           }
@@ -1433,7 +1440,7 @@ module.exports = generators.Base.extend({
      */
     processGrunt : function () {
       // banner message
-      this.banner('We will process grunt task before ending.')
+      this.banner('We will process grunt task before ending.');
       this.spawnCommand('grunt');
     }
   }

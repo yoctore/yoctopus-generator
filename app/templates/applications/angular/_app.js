@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Your main application
  */
@@ -14,14 +16,15 @@ angular.module('<%= name %>', [
 /**
  * Build state for reponsive change
  */
-angular.module('<%= name %>').run([ '$rootScope', '$window', 'screenSize',
+angular.module('<%= name %>')
+.run([ '$rootScope', '$window', 'screenSize',
 function ($rootScope, $window, screenSize) {
   $rootScope.isMobile   = screenSize.is('xs');
   $rootScope.isTablet   = screenSize.is('sm');
   $rootScope.isDesktop  = screenSize.is('md, lg');
 
   // catch resize action
-  angular.element($window).bind('resize', function() {
+  angular.element($window).bind('resize', function () {
     $rootScope.isMobile   = screenSize.is('xs');
     $rootScope.isTablet   = screenSize.is('sm');
     $rootScope.isDesktop  = screenSize.is('md, lg');
@@ -29,4 +32,13 @@ function ($rootScope, $window, screenSize) {
     // apply
     $rootScope.$apply();
   })
+}]);
+
+/**
+ * Add lodash to use in in views, ng-repeat="x in _.range(3)"
+ */
+angular.module('<%= name %>')
+.run([ '$rootScope', function ($rootScope) {
+  // assign
+  $rootScope._ = window._;
 }]);

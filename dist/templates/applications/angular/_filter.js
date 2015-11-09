@@ -1,0 +1,2 @@
+/* generator-yoctopus - Utility tool to build an yoctopus stack based on NodeJs / AngularJs - V1.0.4 */
+"use strict";angular.module("<%= name %>").filter("htmlsafe",["$sce",function(a){return function(b){return a.trustAsHtml(b)}}]),angular.module("<%= name %>").filter("ucfirst",["_",function(a){return function(b){return a.capitalize(b)}}]),angular.module("<%= name %>").filter("dateFormat",["_","moment",function(a,b){return function(c,d){if(!a.isEmpty(c)){var e=d||"DD/MM/YYYY";return b(c).format(e)}}}]);

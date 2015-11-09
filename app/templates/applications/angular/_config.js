@@ -1,7 +1,10 @@
+'use strict';
+
 /**
  * Define local Staote provider configuration
  */
-angular.module('<%= name %>').config([ 'localStorageServiceProvider', 
+angular.module('<%= name %>')
+.config([ 'localStorageServiceProvider', 
 function (localStorageServiceProvider) {
   // set prefix
   localStorageServiceProvider.setPrefix('<%= name %>');
@@ -10,7 +13,8 @@ function (localStorageServiceProvider) {
 /**
  * Allow some ref to compile list. for sms / tel usage
  */
-angular.module('<%= name %>').config([ '$compileProvider', function ($compileProvider) {
+angular.module('<%= name %>')
+.config([ '$compileProvider', function ($compileProvider) {
   // add list
   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|file|tel|sms):/);
 }]);
@@ -18,9 +22,10 @@ angular.module('<%= name %>').config([ '$compileProvider', function ($compilePro
 /**
  * Tricks For Ng Touch, Prevent the base click envent from ngTouch
  */
-angular.module('<%= name %>').config([ '$provide', function ($provide) {
+angular.module('<%= name %>')
+.config([ '$provide', function ($provide) {
  // Create a decoration for ngClickDirective
- $provide.decorator('ngClickDirective', [ '$delegate','$parse', function ($delegate, $parse) {
+ $provide.decorator('ngClickDirective', [ '$delegate', '$parse', function ($delegate, $parse) {
   // Get the original compile function by ngTouch
   var origValue = $delegate[0].compile();
 
@@ -39,11 +44,12 @@ angular.module('<%= name %>').config([ '$provide', function ($provide) {
       var fn = $parse(attr[ 'ngClick' ]);
       // default statement
       return function handler(scope, element) {
+        // bind click event
         element.on('click', function (event) {
           // apply
           scope.$apply(function () {
             // call fn
-            fn(scope, {$event:event});
+            fn(scope, { $event:event });
           });
         });
       }
@@ -57,15 +63,20 @@ angular.module('<%= name %>').config([ '$provide', function ($provide) {
 /**
  * Define your default translate rules
  */
-angular.module('<%= name %>').config( [ 'translateProvider', function ($translateProvider) {
-  // Define language
-  $translateProvider.translations('en', {
-    // Our translations will go in here
-  }).translations('fr', {
-    // Our translations will go in here
-  });
+angular.module('<%= name %>')
+.config([ '$translateProvider', 'appConstantsProvider',
+function ($translateProvider, appConstantsProvider) {
+  // load config
+  $translateProvider.useLoader('translationsLoader');
   // set default language
-  $translateProvider.preferredLanguage('en');
+  $translateProvider.preferredLanguage(appConstantsProvider.keys().translations.defaultLanguage ||
+                                       'en_US');
   // use local storage
   $translateProvider.useLocalStorage();
+  // enable cache language
+  $translateProvider.useLoaderCache(true);
+  // enable async refresh
+  $translateProvider.forceAsyncReload(true);
+  // enable security
+  $translateProvider.useSanitizeValueStrategy('escape');
 }]);

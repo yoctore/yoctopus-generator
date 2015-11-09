@@ -1,0 +1,9 @@
+{
+  "loggingUrl" : "/log/message",
+  "translations" : {
+  "defaultLanguage" : "en_US",
+    "localeUrl"     : "/config/languages/",
+    "resolveDelay"  : 1000,
+    "locales"       : [ "en_US", "fr_FR" ]
+  }
+}

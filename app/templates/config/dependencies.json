@@ -2,7 +2,10 @@
   "node" : {
     "dependencies" : [
       "yocto-logger",
-      "yocto-core-stack"
+      "yocto-core-stack",
+      "lodash",
+      "fs-extra",
+      "yocto-utils"
     ],
     "devDependencies" : [
       "grunt",
@@ -31,10 +34,17 @@
       "angular-filter",
       "angular-local-storage",
       "angulartics",
+      "angulartics-google-analytics",
       "angular-media-queries",
       "angular-translate",
       "moment",
-      "components-font-awesome"
+      "components-font-awesome",
+      "angular-translate-storage-local",
+      "angular-translate-storage-cookie",
+      "angular-translate-loader-url",
+      "async",
+      "lodash",
+      "yocto-angular-jwt"
     ],
     "devDependencies" : [
 
@@ -47,6 +57,9 @@
         "grunt-contrib-concat",
         "yocto-hint",
         "grunt-mocha-cli"
+      ],
+      "dependencies" : [
+        "sitemap"
       ]
     }
   },
@@ -54,10 +67,8 @@
     "node" : {
       "dependencies" : [
         "yocto-mailer",
-        "yocto-utils",
         "q",
         "async",
-        "lodash",
         "express-less",
         "yocto-mongoose"
       ],
@@ -69,7 +80,6 @@
     },
     "angular" : {
       "dependencies" : [
-        "yocto-angular-jwt",
         "crypto-js"
       ],
       "devDependencies" : [

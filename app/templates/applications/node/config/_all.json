@@ -2,11 +2,11 @@
   "env" : "development",
   "port" : 3000,
   "directory" : [
-    { "models"      : "models" },
-    { "controllers" : "controllers" },
-    { "views"       : "views" },
+    { "models"      : "app/models" },
+    { "controllers" : "app/ontrollers" },
+    { "views"       : "app/views" },
     { "public"      : "public" },
-    { "icons"       : "icons" }
+    { "icons"       : "app/icons" }
   ],
   "encrypt_key" : {
     "key"   : "6e67ae372ad6d85cfad1abc366823e28",

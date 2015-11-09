@@ -3,6 +3,7 @@
   "env" : {
     "development" : {
       "logger" : {
+        "level"  : "debug",
         "rotate" : {
           "path" : "./logs",
           "name" : "<%= name %>"
@@ -11,6 +12,7 @@
     },
     "staging" : {
       "logger" : {
+        "level"  : "info",
         "rotate" : {
           "path" : "./logs",
           "name" : "<%= name %>"
@@ -19,6 +21,7 @@
     }, 
     "production" : {
       "logger" : {
+        "level"  : "info",
         "rotate" : {
           "path" : "./logs",
           "name" : "<%= name %>"

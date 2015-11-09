@@ -1,0 +1,26 @@
+[
+  {
+    "method"  : "get",
+    "path": "/config",
+    "controller" : {
+      "name"  : "config",
+      "fn"  : "base"
+    }
+  }, 
+  {
+    "method"  : "get",
+    "path": "/config/languages",
+    "controller" : {
+      "name"  : "config",
+      "fn"  : "languages"
+    }
+  }, 
+  {
+    "method"  : "get",
+    "path": "/config/languages/:isoCode",
+    "controller" : {
+      "name"  : "config",
+      "fn"  : "languages"
+    }
+  }
+]

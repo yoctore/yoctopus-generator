@@ -1,0 +1,10 @@
+[
+  {
+    "method"  : "post",
+    "path": "/log/message",
+    "controller" : {
+      "name"  : "log",
+      "fn"  : "messages"
+    }
+  }
+]

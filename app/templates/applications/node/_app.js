@@ -5,7 +5,7 @@ var core      = require('yocto-core-stack');
 var _         = require('lodash');
 
 // set debug to true. Disabled it on production
-core.debug = true;
+core.debug = false;
 
 // Init your app first
 core.init().then(function () {

@@ -1,0 +1,2 @@
+/* generator-yoctopus - Utility tool to build an yoctopus stack based on NodeJs / AngularJs - V1.0.4 */
+"use strict";var _=require("lodash");exports.messages=function(a,b){var c=a.body.message,d=a.body.type||"error";_.isString(c)&&!_.isEmpty(c)&&this.get("logger")[d](["[ Log:endpoint:messsage ] -",c].join(" ")),b.status(200).end()};

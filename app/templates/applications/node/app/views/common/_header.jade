@@ -1,0 +1,33 @@
+head
+  base(href='/')
+  //- for pre-rendering for SEO
+  meta(name="fragment", content="!")
+  title(data-ng-bind="title")
+  meta(name="description", content="{{ description }}")
+  meta(name="keywords", content="{{ keywords }}")
+  //- mobile view port
+  meta(name="viewport", content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1")
+  //- http Equiv
+  each httpe in httpEquiv
+    meta(http-equiv=httpe.name, content=httpe.value)
+  //- meta
+  each meta in metas
+    meta(name=meta.name, content=meta.value)
+  //- Social
+  each f in facebook
+    meta(property=f.property, content=f.content)
+  each t in twitter
+    meta(property=t.property, content=t.content)
+  //- favion process
+  link(rel="icon", href="/icons/favicon.ico", type="image/x-icon")
+  link(rel="shortcut icon", href="/icons/favicon.ico", type="image/x-icon")
+  //- mobile icons 
+  each mobile in mobileIcons
+    link(rel=mobile.rel, sizes=mobile.sizes, href=mobile.href)
+  each g in google
+    link(rel=g.rel, href=g.href)
+  //- Css
+  each hcss in cssHeader
+    link(href=hcss.link, rel="stylesheet", type="text/css", media=hcss.media)
+  each hjs in jsHeader
+    script(src=hjs.link, type="text/javascript")
