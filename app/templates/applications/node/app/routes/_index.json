@@ -1,15 +1,8 @@
 [
   {
-    "method"  : "get",
-    "path"    : "*",
-    "controller" : {
-      "name"  : "index",
-      "fn"  : "trace"
-    }
-  },
-  {
-    "method"  : "get",
-    "path"    : "/",
+    "method"    : "get",
+    "path"      : "/",
+    "priority"  : 0,
     "controller" : {
       "name"  : "index",
       "fn"  : "index"

@@ -487,12 +487,13 @@ module.exports = generators.Base.extend({
         {
           name        : 'private',
           type        : 'confirm',
+          default     : this.cfg.opensource === true,
           message     : 'Your application is private ?',
         },
         {
           name        : 'license',
           type        : 'list',
-          default     : 'Apache-2.0',
+          default     : (this.cfg.opensource ? 'Apache-2.0' : 'Unlicense'),
           message     : 'Which licence for your application ?',
           choices     : spdx.licenses
         },
@@ -1174,58 +1175,62 @@ module.exports = generators.Base.extend({
       // reach each config
       async.eachSeries([ 'default', 'node', 'angular' ], function (type, next) {
 
-        // default
-        var tconfig = this.gruntConfig.config[type];
-        // async each config
-        async.eachSeries(tconfig, function (config, tnext) {
-          // parse each item
-          async.eachSeries(config.value, function (c, cnext) {
-            // is empty ?
-            if (!_.isEmpty(c)) {
-              // temp key
-              var k = [ config.name, '_key' ].join('');
-              // add config
-              if (_.isUndefined(list[k])) {
-                _.set(list, k, []);
+        if (this.cfg.generate[type] || type === 'default') {
+          // default
+          var tconfig = this.gruntConfig.config[type];
+          // async each config
+          async.eachSeries(tconfig, function (config, tnext) {
+            // parse each item
+            async.eachSeries(config.value, function (c, cnext) {
+              // is empty ?
+              if (!_.isEmpty(c)) {
+                // temp key
+                var k = [ config.name, '_key' ].join('');
+                // add config
+                if (_.isUndefined(list[k])) {
+                  _.set(list, k, []);
+                }
+
+                // default push
+                list[k].push(c);
+                cnext();
               }
-
-              // default push
-              list[k].push(c);
-              cnext();
-            }
+            }.bind(this), function () {
+              // next
+              tnext();
+            }.bind(this));
           }.bind(this), function () {
-            // next
-            tnext();
-          }.bind(this));
-        }.bind(this), function () {
-          // is empty ?
-          if (!_.isEmpty(this.gruntConfig.load[type])) {
-            // reach load
-            this.gruntEditor.loadNpmTasks(this.gruntConfig.load[type]);
-          }
-
-          // each register
-          async.eachSeries(this.gruntConfig.register[type], function (register, rnext) {
-            // register task
-            if (_.isUndefined(registerList[register.name])) {
-              // default list
-              registerList[register.name] = {
-                name        : [],
-                description : [],
-                value       : []
-              };
+            // is empty ?
+            if (!_.isEmpty(this.gruntConfig.load[type])) {
+              // reach load
+              this.gruntEditor.loadNpmTasks(this.gruntConfig.load[type]);
             }
-            // list register
-            registerList[register.name].name.push(register.name);
-            registerList[register.name].description.push(register.description);
-            registerList[register.name].value.push(register.value);
-            // next item
-            rnext();
-          }.bind(this) , function () {
-            // next process
-            next();
-          });
-        }.bind(this));
+
+            // each register
+            async.eachSeries(this.gruntConfig.register[type], function (register, rnext) {
+              // register task
+              if (_.isUndefined(registerList[register.name])) {
+                // default list
+                registerList[register.name] = {
+                  name        : [],
+                  description : [],
+                  value       : []
+                };
+              }
+              // list register
+              registerList[register.name].name.push(register.name);
+              registerList[register.name].description.push(register.description);
+              registerList[register.name].value.push(register.value);
+              // next item
+              rnext();
+            }.bind(this) , function () {
+              // next process
+              next();
+            });
+          }.bind(this));
+        } else {
+          next();
+        }
       }.bind(this), function () {
 
         // build each register

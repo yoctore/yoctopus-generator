@@ -3,7 +3,7 @@
   "port" : 3000,
   "directory" : [
     { "models"      : "app/models" },
-    { "controllers" : "app/ontrollers" },
+    { "controllers" : "app/controllers" },
     { "views"       : "app/views" },
     { "public"      : "public" },
     { "icons"       : "app/icons" }

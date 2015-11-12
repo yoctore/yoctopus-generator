@@ -1,0 +1,18 @@
+[
+  {
+    "error" : 404,
+    "priority" : 900,
+    "controller" : {
+      "name"  : "error",
+      "fn"  : "notFound"
+    }
+  },
+  {
+    "error" : 500,
+    "priority" : 901,
+    "controller" : {
+      "name"  : "error",
+      "fn"  : "systemError"
+    }
+  }
+]

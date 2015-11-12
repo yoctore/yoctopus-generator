@@ -1,0 +1,2 @@
+/* generator-yoctopus-test - Utility tool to build an yoctopus stack based on NodeJs / AngularJs - V1.1.0 */
+"use strict";exports.trace=function(a,b,c){this.get("logger").debug(["[ Router ] - Receiving a",a.method,"request for",a.originalUrl].join(" ")),c()};

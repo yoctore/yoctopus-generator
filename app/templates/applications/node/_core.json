@@ -6,7 +6,7 @@
         "level"  : "debug",
         "rotate" : {
           "path" : "./logs",
-          "name" : "<%= name %>"
+          "name" : "<%= name %>.log"
         }
       }
     },
@@ -15,16 +15,16 @@
         "level"  : "info",
         "rotate" : {
           "path" : "./logs",
-          "name" : "<%= name %>"
+          "name" : "<%= name %>.log"
         }
       }
-    }, 
+    },
     "production" : {
       "logger" : {
         "level"  : "info",
         "rotate" : {
           "path" : "./logs",
-          "name" : "<%= name %>"
+          "name" : "<%= name %>.log"
         }
       }
     }

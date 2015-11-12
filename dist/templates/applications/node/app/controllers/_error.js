@@ -1,0 +1,2 @@
+/* generator-yoctopus-test - Utility tool to build an yoctopus stack based on NodeJs / AngularJs - V1.1.0 */
+"use strict";exports.notFound=function(a,b,c){b.sendStatus(404)},exports.systemError=function(a,b,c,d){this.get("logger").error(["[ Router ] - A system error occured",a.stack].join(" ")),c.sendStatus(500)};

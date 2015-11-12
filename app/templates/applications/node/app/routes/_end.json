@@ -1,0 +1,11 @@
+[
+  {
+    "method"   : "get",
+    "priority" : 999,
+    "path"     : "*",
+    "controller" : {
+      "name"  : "end",
+      "fn"  : "trace"
+    }
+  }
+]

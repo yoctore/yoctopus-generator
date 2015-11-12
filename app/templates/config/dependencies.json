@@ -5,7 +5,8 @@
       "yocto-core-stack",
       "lodash",
       "fs-extra",
-      "yocto-utils"
+      "yocto-utils",
+      "sitemap"
     ],
     "devDependencies" : [
       "grunt",
@@ -47,7 +48,6 @@
       "yocto-angular-jwt"
     ],
     "devDependencies" : [
-
     ],
     "node" : {
       "devDependencies" : [
@@ -56,7 +56,9 @@
         "grunt-ng-annotate",
         "grunt-contrib-concat",
         "yocto-hint",
-        "grunt-mocha-cli"
+        "grunt-mocha-cli",
+        "grunt-contrib-less",
+        "grunt-html2js"
       ],
       "dependencies" : [
         "sitemap"
@@ -69,13 +71,9 @@
         "yocto-mailer",
         "q",
         "async",
-        "express-less",
         "yocto-mongoose"
       ],
       "devDependencies" : [
-        "grunt-contrib-cssmin",
-        "grunt-html2js",
-        "grunt-contrib-less"
       ]
     },
     "angular" : {

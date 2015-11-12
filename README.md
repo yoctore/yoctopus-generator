@@ -39,3 +39,11 @@ yo yoctopus
 
 For the moment please read readme.md of each of our [yocto modules](https://www.npmjs.com/~yocto), each modules describe what we can do with it.
 In the future we will generate an documentation with more details.
+
+
+## Angular Events
+
+For angular project we provide an auto loading of config files.
+All error events was automatically catch.
+
+If you want run your angular scripts when app is ready you must catch the `$applicationIsReady` event from `$rootScope`.
