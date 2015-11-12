@@ -1,2 +1,2 @@
-/* generator-yoctopus-test - Utility tool to build an yoctopus stack based on NodeJs / AngularJs - V1.1.0 */
+/* generator-yoctopus - Utility tool to build an yoctopus stack based on NodeJs / AngularJs - V1.2.0 */
 "use strict";angular.module("<%= name %>").service("logService",["$log","appConstants","$http","_",function(a,b,c,d){return{notify:function(a,e){var f=b.keys().loggingUrl;d.isUndefined(f)||!d.isString(f)||d.isEmpty(f)?this.log("Cannot notify. Remote logging url is not defined."):c.post(b.keys().loggingUrl,{message:a,type:e})},log:function(b){a.log(b)},info:function(b){a.info(b)},warn:function(b){this.notify(b,"warning"),a.warn(b)},error:function(b){this.notify(b,"error"),a.error(b)},debug:function(b){a.debug(b)}}}]);

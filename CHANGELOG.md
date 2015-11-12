@@ -1,3 +1,7 @@
+## 1.2.1 (2015-11-09)
+
+- Add checklit model directive on directives part for angular
+
 ## 1.2.0 (2015-11-09)
 
 - Adding new template
