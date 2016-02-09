@@ -1,7 +1,7 @@
 [
   {
     "error" : 404,
-    "priority" : 900,
+    "priority" : 998,
     "controller" : {
       "name"  : "error",
       "fn"  : "notFound"
@@ -9,7 +9,7 @@
   },
   {
     "error" : 500,
-    "priority" : 901,
+    "priority" : 999,
     "controller" : {
       "name"  : "error",
       "fn"  : "systemError"

@@ -1,7 +1,7 @@
 [
   {
     "method"   : "get",
-    "priority" : 999,
+    "priority" : 990,
     "path"     : "*",
     "controller" : {
       "name"  : "end",

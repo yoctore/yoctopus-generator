@@ -1,7 +1,7 @@
 {
   "name": "generator-yoctopus",
   "description": "Utility tool to build an yoctopus stack based on NodeJs / AngularJs",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "scripts": {},
   "author"  : {
     "name"  : "Yocto SAS",
@@ -21,10 +21,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/yocto-node-modules/yoctopus-generator.git"
+    "url": "https://github.com/yoctore/yoctopus-generator.git"
   },
   "bugs": {
-    "url": "https://gitlab.com/yocto-node-modules/yoctopus-generator/issues"
+    "url": "https://github.com/yoctore/yoctopus-generator/issues"
   },
 
   "engines": {
