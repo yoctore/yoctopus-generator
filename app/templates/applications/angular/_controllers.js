@@ -1,6 +1,13 @@
 'use strict';
+
 /**
  * Main application controller
+ *
+ * @param {Object} $rootScope https://docs.angularjs.org/api/ng/service/$rootScope
+ * @param {Object} logService current service for logging
+ * @param {Object} appConstants current applications constants
+ * @param {Object} $translate current $translate instance https://angular-translate.github.io/docs/
+ * @param {Object} $scope https://docs.angularjs.org/api/ng/type/$rootScope.Scope
  */
 angular.module('<%= name %>')
 .controller('ApplicationController',
@@ -18,11 +25,10 @@ function ($rootScope, logService, appConstants, $translate, $scope) {
   // on failed ?
   $rootScope.$on('$configLoadSuccess', function (event, data) {
     // keep safe language before process
-    //console.log(appConstants.keys().translations);
     var languages = appConstants.keys().translations.locales;
     // parse languages list
     _.each(languages, function (locale, key) {
-      languages[key] = { 
+      languages[key] = {
         isoCode : locale,
         label   : [ 'LANG', locale.toUpperCase(), 'LABEL' ] .join('_')
       };
@@ -59,13 +65,37 @@ function ($rootScope, logService, appConstants, $translate, $scope) {
 
   // load config
   appConstants.load();
+}]);
 
-  /*******************************************************************
-   *                       TRANSLATE PART
-   *******************************************************************/
+/*******************************************************************
+ *                       TRANSLATE PART
+ *******************************************************************/
+
+/**
+ * Default translate controller to manage lang
+ *
+ * @param {Object} $translate current $translate instance https://angular-translate.github.io/docs/
+ * @param {Object} _ lodash object https://lodash.com/docs
+ * @param {Object} $scope https://docs.angularjs.org/api/ng/type/$rootScope.Scope
+ * @param {Object} $rootScope https://docs.angularjs.org/api/ng/service/$rootScope
+ */
+angular.module('<%= name %>')
+.controller('TranslateController', [ '$translate' , '_', '$scope', '$rootScope',
+function ($translate, _, $scope, $rootScope) {
+  /**
+   * return state to check if current lang is selected lang
+   *
+   * @return {Boolean} true if match false otherwise
+   */
+  $scope.isActive = function (lang) {
+    // default statement
+    return $translate.use() === lang;
+  }
 
   /**
    * Default method to change language
+   *
+   * @param {String} lang current lang to use
    */
   $scope.changeLanguage = function (lang) {
     // is valid ?
@@ -74,4 +104,13 @@ function ($rootScope, logService, appConstants, $translate, $scope) {
       $translate.use(lang);
     }
   };
+
+  /**
+   * Watch the $translateChangeEnd event
+   */
+  $rootScope.$on('$translateChangeEnd', function () {
+    // Broadcast the change translate
+    $scope.$broadcast('$translate.change');
+  });
 }]);
+

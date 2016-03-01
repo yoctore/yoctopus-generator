@@ -2,6 +2,8 @@
 
 /**
  * Trust HTML Filter
+ *
+ * @param {Object} $sce https://docs.angularjs.org/api/ng/service/$sce
  */
 angular.module('<%= name %>')
 .filter('htmlsafe', [ '$sce', function ($sce) {
@@ -14,6 +16,8 @@ angular.module('<%= name %>')
 
 /**
  * Special filter for string. Transport string to ucfirst
+ *
+ * @param {Object} _ lodash object https://lodash.com/docs
  */
 angular.module('<%= name %>')
 .filter('ucfirst', [ '_', function (_) {
@@ -27,8 +31,10 @@ angular.module('<%= name %>')
 /**
  * Custom filter to return a specific string on date format
  *
- * @example : {{ data | ecrmdate }}
- * @example : {{ data | ecrmdate:'YYYY/DD/MM' }}
+ * @example : {{ data | dateFormat }}
+ * @example : {{ data | dateFormat:'YYYY/DD/MM' }}
+ * @param {Object} _ lodash object https://lodash.com/docs
+ * @param {Object} moment http://momentjs.com/docs/
  */
 angular.module('<%= name %>')
 .filter('dateFormat', [ '_', 'moment', function (_, moment) {
@@ -42,5 +48,136 @@ angular.module('<%= name %>')
       // return specific date
       return moment(value).format(dateFormat);
     }
+  };
+}]);
+
+/**
+ * Special filter to remove extra prefix code on iso code. to retreive main country code
+ *
+ * @param {Object} _ lodash object https://lodash.com/docs
+ */
+angular.module('<%= name %>')
+.filter('isoFlags', [ '_', function (_) {
+  // default statement
+  return function (value) {
+    // return value
+    return value.substring((value.length - 2), value.length);
+  };
+}]);
+
+/**
+ * Special filter add Cdn Url from given path
+ *
+ * @param {Object} _ lodash object https://lodash.com/docs
+ * @param {Object} appConstants current applications constants
+ */
+angular.module('<%= name %>')
+.filter('CdnUrl', [ '_', 'appConstants', function (_, appConstants) {
+  // default statement
+  return function (path) {
+    // default assets
+    var assets = appConstants.assets || {};
+    // return value
+    return [ assets.CdnUrl || '', path ].join('/');
+  };
+}]);
+
+/**
+ * Special filter to build a correct alt name for a picture
+ *
+ * @param {Object} _ lodash object https://lodash.com/docs
+ */
+angular.module('<%= name %>')
+.filter('altImg', [ '_', function (_) {
+  // default statement
+  return function (path) {
+    // process image replacement
+    return _.snakeCase(path).replace(/_/g, '-');
+  };
+}]);
+
+/**
+ * Special filter to truncate a string
+ *
+ * @param {Object} _ lodash object https://lodash.com/docs
+ */
+angular.module('<%= name %>')
+.filter('truncate', [ '_', function (_) {
+  // default statement
+  return function (value, length) {
+    // normalize lentgh
+    length = !_.isNumber(length) ? value.length : length;
+    // process truncate
+    return _.trunc(value, length);
+  };
+}]);
+
+/**
+ * Special filter to check is value is a number
+ *
+ * @param {Object} _ lodash object https://lodash.com/docs
+ */
+angular.module('<%= name %>')
+.filter('isNumber', [ '_', function (_) {
+  // default statement
+  return function (value) {
+    // default statement
+    return _.isNumber(value);
+  };
+}]);
+
+/**
+ * Special filter to check is value is a number
+ *
+ * @param {Object} _ lodash object https://lodash.com/docs
+ */
+angular.module('<%= name %>')
+.filter('isStringStrict', [ '_', function (_) {
+  // default statement
+  return function (value) {
+    // default statement
+    return _.isString(value) && !_.isNumber(value);
+  };
+}]);
+
+/**
+ * Special filter to check is value is a number
+ *
+ * @param {Object} _ lodash object https://lodash.com/docs
+ */
+angular.module('<%= name %>')
+.filter('isArray', [ '_', function (_) {
+  // default statement
+  return function (value) {
+    // default statement
+    return _.isArray(value);
+  };
+}]);
+
+/**
+ * Special filter to check is value is an Object
+ *
+ * @param {Object} _ lodash object https://lodash.com/docs
+ */
+angular.module('<%= name %>')
+.filter('isObject', [ '_', function (_) {
+  // default statement
+  return function (value) {
+    // default statement
+    return _.isObject(value);
+  };
+}]);
+
+/**
+ * Special filter to check is value is empty or not
+ *
+ * @param {Object} _ lodash object https://lodash.com/docs
+ */
+angular.module('<%= name %>')
+.filter('isEmpty', [ '_', function (_) {
+  // default statement
+  return function (value) {
+    // default statement
+    return _.isEmpty(value);
   };
 }]);

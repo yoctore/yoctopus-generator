@@ -1,7 +1,15 @@
 'use strict';
 
 /**
- * A translation factory to manage translation loading
+ * A translation loader factory to manage translation loading
+ *
+ * @param {Object} $q https://docs.angularjs.org/api/ng/service/$q
+ * @param {Object} appConstants current applications constants
+ * @param {Object} $http https://docs.angularjs.org/api/ng/service/$http
+ * @param {Object} logService current service for logging
+ * @param {Object} _ lodash object https://lodash.com/docs
+ * @param {Object} $rootScope https://docs.angularjs.org/api/ng/service/$rootScope
+ * @param {Object} appTranslate current application translate provider
  */
 angular.module('<%= name %>')
 .factory('translationsLoader',

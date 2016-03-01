@@ -7,12 +7,17 @@ angular.module('<%= name %>')
 .provider('appConstants', [ function () {
   // default config values
   var values = {
+    loaded          : false,
+    debug           : false,
     loggingUrl      : '',
     translations    : {
       defaultLanguage : 'en_US',
       localeUrl       : '',
       resolveDelay    : 1000,
       locales         : []
+    },
+    session : {
+      delay : 10000
     }
   };
 
@@ -60,10 +65,12 @@ angular.module('<%= name %>')
          * Default load method to retreive data
          */
         load : function () {
-          //console.log($injector.get('configManagerService'));
+          // load config
           $http.get('/config', {
             cache   : true
           }).then(function (data) {
+            // set loaded to true
+            _.extend(data.data, { loaded : true });
             // set data
             configure(data.data);
             // emit event load ok
@@ -85,6 +92,7 @@ angular.module('<%= name %>')
 .provider('appTranslate', [ function () {
   // default translate values
   var values = {
+    loaded : false,
     langs : {}
   };
 
@@ -95,9 +103,7 @@ angular.module('<%= name %>')
    */
   var configure = function (constants) {
     // extend value
-    angular.merge(values.langs, constants);
-    // freeze object value with new
-    values = Object.freeze(values);
+    angular.merge(values, constants);
   };
 
   // default statement
@@ -134,6 +140,20 @@ angular.module('<%= name %>')
           return values.langs;
         },
         /**
+         * An utility method to get data from provider to retreive default data
+         */
+        allKeys : function () {
+          // default statement
+          return values;
+        },
+        /**
+         * Check if language exist
+         */
+        has : function (lang) {
+          // default statement
+          return _.has(this.keys(), lang);
+        },
+        /**
          * Default load method to retreive data
          */
         load : function (lang) {
@@ -155,12 +175,14 @@ angular.module('<%= name %>')
               // translations ?
               if (!_.isEmpty(translation.data)) {
                 // merge object
-                this.configure(_.set({}, isoCode, translation.data));
+                this.configure({ loaded : true, langs : { isoCode : translation.data } });
                 // resolve
                 deferred.resolve(translation.data);
               } else {
                 // log message
                 logService.warn([ 'Translations for key [', isoCode, '] are empty' ].join(''));
+                // set loaded to true
+                this.configure({ loaded : true });
               }
             }.bind(this), function (error) {
               // log message
@@ -176,7 +198,3 @@ angular.module('<%= name %>')
     }]
   };
 }]);
-
-
-
-

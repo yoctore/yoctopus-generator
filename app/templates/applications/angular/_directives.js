@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Default CheckList model directives. for multiple checkbox choice
  * @see https://docs.angularjs.org/api/ng/service/$parse

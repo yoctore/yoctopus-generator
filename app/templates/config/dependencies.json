@@ -6,7 +6,8 @@
       "lodash",
       "fs-extra",
       "yocto-utils",
-      "sitemap"
+      "sitemap",
+      "glob"
     ],
     "devDependencies" : [
       "grunt",
@@ -45,7 +46,9 @@
       "angular-translate-loader-url",
       "async",
       "lodash",
-      "yocto-angular-jwt"
+      "yocto-angularjwt",
+      "angular-toastr",
+      "crypto-js"
     ],
     "devDependencies" : [
     ],
@@ -74,11 +77,11 @@
         "yocto-mongoose"
       ],
       "devDependencies" : [
+        "chai"
       ]
     },
     "angular" : {
       "dependencies" : [
-        "crypto-js"
       ],
       "devDependencies" : [
       ]

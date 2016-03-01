@@ -1,8 +1,8 @@
 [
   {
-    "method"   : "get",
-    "priority" : 990,
-    "path"     : "*",
+    "method"  : "get",
+    "path"    : "*",
+    "priority" : 997, 
     "controller" : {
       "name"  : "end",
       "fn"  : "trace"

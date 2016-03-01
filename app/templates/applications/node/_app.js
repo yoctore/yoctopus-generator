@@ -4,7 +4,7 @@ var logger    = require('yocto-logger');
 var core      = require('yocto-core-stack');
 var _         = require('lodash');
 
-// set debug to true. Disabled it on production
+// set debug to true. disabled it on production
 core.debug = false;
 
 // Init your app first

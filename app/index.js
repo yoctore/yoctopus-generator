@@ -294,7 +294,7 @@ module.exports = generators.Base.extend({
       // prompt message
       this.prompt([ {
         name    : 'ready',
-        message : 'This process will take ~5 minutes. Are your ready ?',
+        message : 'This process will take ~5 <-> 10 minutes. Are your ready ?',
         type    : 'confirm'
       }], function (props) {
         // ready ?
@@ -508,7 +508,7 @@ module.exports = generators.Base.extend({
           default     : this.user.git.email(),
           validate    : function (input) {
             // default statement
-            return isEmail(input) ? true : 'Please enter a valid email';
+            return isEmail.validate(input) ? true : 'Please enter a valid email';
           }
         },
         {
@@ -634,7 +634,7 @@ module.exports = generators.Base.extend({
           default     : this.user.git.email(),
           validate    : function (input) {
             // default statement
-            return isEmail(input) ? true : 'Please enter a valid email';
+            return isEmail.validate(input) ? true : 'Please enter a valid email';
           }
         },
         {
@@ -1261,11 +1261,35 @@ module.exports = generators.Base.extend({
           // add config
           this.gruntEditor.insertConfig(pkey, item);
         }, this);
-
         // beautidy content
         var content = jsbeauty(this.gruntEditor.toString(), { 'indent_size' : 2 });
         // replace some brakets and ":"
         content = content.replace(/\[/g, '[ ').replace(/\]/g, ' ]');
+
+        // load npm Task regex to replace after
+        var lnpmTasksRegex  = /(grunt\.loadNpmTasks.*)/gm;
+        // reg founded item for replacement after
+        var regFounded      = [];
+
+        // temp loop item
+        var m;
+
+        // get all item
+        while ((m = lnpmTasksRegex.exec(content)) !== null) {
+          // is last item ?
+          if (m.index === lnpmTasksRegex.lastIndex) {
+            // go to the next item
+            lnpmTasksRegex.lastIndex++;
+          }
+          // add item to temp storage
+          regFounded.push(_.first(m));
+        }
+        // push replace item
+        regFounded.push('grunt.registerTask');
+        // replace registerTask by new content new content
+        content = content.replace(/(grunt\.loadNpmTasks.*)/gm, '');
+        content = content.replace(/(grunt.registerTask)/, regFounded.join('\n  '));
+
         // write file
         fs.writeFile(this.prefixPath('Gruntfile.js'), content, function (err) {
           // start a timeout here
@@ -1345,6 +1369,13 @@ module.exports = generators.Base.extend({
                 // has name ? if true replace
                 if (_.has(this[type], 'name')) {
                   content = content.replace(/<%= name %>/g, this[type].name);
+                }
+
+                // is travis file ?
+                if (_.includes(nFile, '.travis.yml')) {
+                  // replace node version
+                  content = content.replace(/<%= NODE_VERSION %>/g,
+                    this.node.engines.node.replace('>=', ''));
                 }
 
                 // write file

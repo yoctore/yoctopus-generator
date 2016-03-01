@@ -14,7 +14,7 @@
       "logger" : {
         "level"  : "info",
         "rotate" : {
-          "path" : "./logs",
+          "path" : "/var/log",
           "name" : "<%= name %>.log"
         }
       }
@@ -23,7 +23,7 @@
       "logger" : {
         "level"  : "info",
         "rotate" : {
-          "path" : "./logs",
+          "path" : "/var/log",
           "name" : "<%= name %>.log"
         }
       }

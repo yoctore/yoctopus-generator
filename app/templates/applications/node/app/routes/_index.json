@@ -1,8 +1,8 @@
 [
   {
-    "method"    : "get",
-    "path"      : "/",
-    "priority"  : 0,
+    "method"  : "get",
+    "path"    : "/",
+    "priority" : 0,
     "controller" : {
       "name"  : "index",
       "fn"  : "index"

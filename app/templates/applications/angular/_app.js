@@ -10,11 +10,17 @@ angular.module('<%= name %>', [
   'LocalStorageModule', 
   'angulartics', 'angulartics.google.analytics',
   'matchMedia',
-  'pascalprecht.translate'
+  'pascalprecht.translate',
+  'yocto-angular-jwt',
+  'toastr'
 ]);
 
 /**
  * Build state for reponsive change
+ *
+ * @param {Object} $rootScope https://docs.angularjs.org/api/ng/service/$rootScope
+ * @param {Object} $window https://docs.angularjs.org/api/ng/service/$window
+ * @param {Object} screenSize https://github.com/jacopotarantino/angular-match-media
  */
 angular.module('<%= name %>')
 .run([ '$rootScope', '$window', 'screenSize',
@@ -35,7 +41,9 @@ function ($rootScope, $window, screenSize) {
 }]);
 
 /**
- * Add lodash to use in in views, ng-repeat="x in _.range(3)"
+ * Add lodash to use in in views, ng-repeat="x in _.range(3)" And other init
+ *
+ * @param {Object} $rootScope https://docs.angularjs.org/api/ng/service/$rootScope
  */
 angular.module('<%= name %>')
 .run([ '$rootScope', function ($rootScope) {
