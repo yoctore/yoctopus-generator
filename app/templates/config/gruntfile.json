@@ -59,8 +59,8 @@
       "name" : "less",
       "value" : [
         "development : { options : { paths : [ 'assets/css/src' ], rootpath : '', compress : true, ieCompat : true, banner : '/* <%= pkg.name %> - <%= pkg.description %> - V<%= pkg.version %> */\\n' }, files : { 'public/assets/css/dist/application.min.css' : [ 'public/assets/css/src/less/*.less' ] } }",
-        "stagging : { options : { paths : [ 'assets/css/src' ], rootpath : '', compress : true, ieCompat : true, modifyVars : { CDNUrl : '' }, banner : '/* <%= pkg.name %> - <%= pkg.description %> - V<%= pkg.version %> */\\n' }, files : { 'public/assets/css/dist/ecrm-backoffice.min.css' : [ 'public/assets/css/src/less/*.less' ] } }",
-      "production : { options : { paths : [ 'assets/css/src' ], rootpath : '', compress : true, ieCompat : true, modifyVars : { CDNUrl : '' }, banner : '/* <%= pkg.name %> - <%= pkg.description %> - V<%= pkg.version %> */\\n' }, files : { 'public/assets/css/dist/ecrm-backoffice.min.css' : [ 'public/assets/css/src/less/*.less' ] } }"
+        "stagging : { options : { paths : [ 'assets/css/src' ], rootpath : '', compress : true, ieCompat : true, modifyVars : { CDNUrl : '' }, banner : '/* <%= pkg.name %> - <%= pkg.description %> - V<%= pkg.version %> */\\n' }, files : { 'public/assets/css/dist/application.min.css' : [ 'public/assets/css/src/less/*.less' ] } }",
+      "production : { options : { paths : [ 'assets/css/src' ], rootpath : '', compress : true, ieCompat : true, modifyVars : { CDNUrl : '' }, banner : '/* <%= pkg.name %> - <%= pkg.description %> - V<%= pkg.version %> */\\n' }, files : { 'public/assets/css/dist/application.min.css' : [ 'public/assets/css/src/less/*.less' ] } }"
       ]
     },
     {

@@ -48,8 +48,8 @@
       "assets" : {
         "header" : {
           "css" : [
-            { "link" : "assets/css/dist/application.min.css", "media" : "screen" },
-            { "link" : "assets/css/dist/static-components.min.css", "media" : "screen" }
+            { "link" : "assets/css/dist/static-components.min.css", "media" : "screen" },
+            { "link" : "assets/css/dist/application.min.css", "media" : "screen" }
           ],
           "js" : [
             { "link" : "assets/js/dist/external-addons.min.js" },
