@@ -1,2 +1,2 @@
-/* generator-yoctopus - Utility tool to build an yoctopus stack based on NodeJs / AngularJs - V1.3.0 */
+/* generator-yoctopus - Utility tool to build an yoctopus stack based on NodeJs / AngularJs - V1.3.1 */
 "use strict";angular.module("<%= name %>").config(["$stateProvider","$urlRouterProvider","$locationProvider","$urlMatcherFactoryProvider",function(a,b,c,d){c.html5Mode(!0),d.strictMode(!1),b.otherwise("/"),a.state("default",{url:"/",templateUrl:"partials/index"})}]);

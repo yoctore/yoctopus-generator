@@ -1,1 +1,7 @@
-{}
+{
+  "jwt" : {
+    "enable"        : true,
+    "key"           : "a8ba00db9f8f50e70d65a2d6f68473578aa02f113d9d82f87c8fe1be82e5b5ff",
+    "ips"           : [ "*" ]
+  }
+}

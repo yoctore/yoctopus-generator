@@ -1,0 +1,2 @@
+/* generator-yoctopus - Utility tool to build an yoctopus stack based on NodeJs / AngularJs - V1.3.1 */
+"use strict";var _=require("lodash");exports.tokenRefresh=function(a,b){var c=this.get("jwt");b.send(c?c.generateAccessToken():"You must enable jwt").end()};

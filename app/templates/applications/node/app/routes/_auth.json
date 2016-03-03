@@ -1,0 +1,11 @@
+[
+  {
+    "method"  : "get",
+    "path"    : "/token/refresh",
+    "priority" : 0,
+    "controller" : {
+      "name"  : "auth",
+      "fn"  : "tokenRefresh"
+    }
+  }
+]

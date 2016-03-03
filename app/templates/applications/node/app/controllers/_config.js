@@ -3,6 +3,8 @@
 var path  = require('path');
 var fs    = require('fs');
 var glob  = require('glob');
+var async = require('async');
+var _     = require('lodash');
 
 /**
  * Retreive default config data for your app
