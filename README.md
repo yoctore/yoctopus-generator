@@ -1,10 +1,9 @@
 ![alt text](https://david-dm.org/yoctore/yoctopus-generator.svg "Dependencies Status")
+[![Code Climate](https://codeclimate.com/github/yoctore/yoctopus-generator/badges/gpa.svg)](https://codeclimate.com/github/yoctore/yoctopus-generator)
+[![Test Coverage](https://codeclimate.com/github/yoctore/yoctopus-generator/badges/coverage.svg)](https://codeclimate.com/github/yoctore/yoctopus-generator/coverage)
+[![Issue Count](https://codeclimate.com/github/yoctore/yoctopus-generator/badges/issue_count.svg)](https://codeclimate.com/github/yoctore/yoctopus-generator)
 
 ## Overview
-
-This module is a part of yocto node modules for NodeJS.
-
-Please see [our NPM repository](https://www.npmjs.com/~yocto) for complete list of available tools (completed day after day).
 
 This generator build an **Yoctopus** *(Yes this is a name of our tools ;) )* stack based on NodeJs / AngularJs and our [yocto modules](https://www.npmjs.com/~yocto).
 
@@ -49,3 +48,8 @@ For angular project we provide an auto loading of config files.
 All error events was automatically catch.
 
 If you want run your angular scripts when app is ready you must catch the `$applicationIsReady` event from `$rootScope`.
+
+## Need more modules ?
+
+Please see [our NPM repository](https://www.npmjs.com/~yocto) for complete list of available tools (completed day after day).
+
