@@ -1,3 +1,7 @@
+## 1.3.3 (2016-03-04)
+
+- Fix codeclimate issues
+
 ## 1.2.1 (2015-11-09)
 
 - Add checklit model directive on directives part for angular
