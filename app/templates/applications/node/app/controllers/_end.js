@@ -11,6 +11,12 @@ exports.trace = function(req, res, next) {
   this.get('logger').debug([ '[ Router ] - Receiving a', req.method,
                              'request for', req.originalUrl
                            ].join(' '));
-  // next process
-  next();
+  // if xhr ??
+  if (req.xhr) {
+    // go to not found
+    next();
+  } else {
+    // render your index
+    this.get('render').render(res, 'index', {});
+  }
 };
