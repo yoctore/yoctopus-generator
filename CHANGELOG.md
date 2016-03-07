@@ -1,3 +1,8 @@
+## 1.3.4 (2016-03-04)
+
+- Fix issues from lodash
+- Add travis deploy config
+
 ## 1.3.3 (2016-03-04)
 
 - Fix codeclimate issues

@@ -151,12 +151,13 @@ function (_, logService) {
  * @param {Object} logService current service for logging
  * @param {Object} httpService current application http service to process http request
  * @param {Object} localStorageServiceProvider https://github.com/grevory/angular-local-storage
+ * @param {Object} _ lodash object https://lodash.com/docs
  */
 angular.module('<%= name %>')
 .service('httpService', [ '$http', '$q', 'appConstants', 'apiRouteFactory',
-'logService', 'httpResponse', 'localStorageService', 'cryptoService',
+'logService', 'httpResponse', 'localStorageService', 'cryptoService', '_',
 function ($http, $q, appConstants, apiRouteFactory, logService, httpResponse,
-localStorageService, cryptoService) {
+localStorageService, cryptoService, _) {
   // default statement
   return {
     /**
@@ -186,7 +187,7 @@ localStorageService, cryptoService) {
 
         // config is valid ?
         if (_.isString(config.url) && !_.isEmpty(config.url) &&
-            _.contains([ 'GET', 'HEAD', 'POST','PUT', 'DELETE', 'JSONP', 'PATCH' ],
+            _.includes([ 'GET', 'HEAD', 'POST','PUT', 'DELETE', 'JSONP', 'PATCH' ],
             config.method)) {
 
           // tricks for interval api call server to server

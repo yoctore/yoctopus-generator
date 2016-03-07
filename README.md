@@ -1,3 +1,5 @@
+[![NPM](https://nodei.co/npm/yoctopus-generator.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/yoctopus-generator/)
+
 ![alt text](https://david-dm.org/yoctore/yoctopus-generator.svg "Dependencies Status")
 [![Code Climate](https://codeclimate.com/github/yoctore/yoctopus-generator/badges/gpa.svg)](https://codeclimate.com/github/yoctore/yoctopus-generator)
 [![Test Coverage](https://codeclimate.com/github/yoctore/yoctopus-generator/badges/coverage.svg)](https://codeclimate.com/github/yoctore/yoctopus-generator/coverage)
