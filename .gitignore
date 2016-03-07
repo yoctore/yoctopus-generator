@@ -4,6 +4,5 @@ README_old.md
 .editorconfig
 .jshintrc
 .yo-rc.json
-.travis.yml
 npm-debug.log
 *~
