@@ -1,7 +1,7 @@
 {
   "name": "generator-yoctopus",
   "description": "Utility tool to build an yoctopus stack based on NodeJs / AngularJs",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "scripts": {},
   "author": {
     "name": "Yocto SAS",
