@@ -182,7 +182,7 @@ localStorageService, cryptoService, _) {
       // is a valid item ?
       if (item) {
         // mixed process
-        _.set(config, 'url', apiRouteFactory.getUrl(key, properties));
+        _.set(config, 'url', apiRouteFactory.getUrl(key, properties, item.api ? false : item.api));
         _.set(config, 'method', item.type ? item.type.toUpperCase() : false);
 
         // config is valid ?
@@ -346,7 +346,7 @@ moment, cryptoService) {
           // if success ?
           if (success) {
             // YOUR CODE HERE
-            console.log('Log user info succeed. Please provide code on service.js ligne 348');
+            console.log('Log user info succeed. Please provide code on service.js ligne 349');
             // broadcast event 
             $rootScope.$broadcast('$session.valid');
           }
@@ -420,6 +420,18 @@ moment, cryptoService) {
 
       // invalid state
       return false;
+    },
+    /**
+     * destroy the cookie Session
+     */
+    destroySession : function () {
+      // destroySession
+      httpService.process('destroySession').then(function () {
+        // call default callback 
+        changeEventCallback();
+      }, function (error) {
+        logService.error([ 'Cannot destroy user session :', JSON.stringify(error) ].join(' '));
+      });
     }
   }
 }]);
@@ -442,7 +454,8 @@ angular.module('<%= name %>')
      */
     encrypt : function (value) {
       // default statement
-      return CryptoJS.AES.encrypt(JSON.stringify(value), appConstants.keys().keys.shared).toString();
+      return CryptoJS.AES.encrypt(JSON.stringify(value),
+        appConstants.keys().keys.shared).toString();
     },
     /**
      * Default decrypt function

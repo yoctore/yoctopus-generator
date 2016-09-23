@@ -48,7 +48,11 @@
       "lodash",
       "yocto-angularjwt",
       "angular-toastr",
-      "crypto-js"
+      "crypto-js",
+      "videogular",
+      "ngInfiniteScroll",
+      "angular-breadcrumb",
+      "angular-cookie-law"
     ],
     "devDependencies" : [
     ],

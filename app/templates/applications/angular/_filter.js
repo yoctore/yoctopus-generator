@@ -52,6 +52,27 @@ angular.module('<%= name %>')
 }]);
 
 /**
+ * Replace bad value in ICU url
+ *
+ * @example : {{ data | trimBadUrl:'filter':'replacement' }}
+ * @param {Object} _ lodash object https://lodash.com/docs
+ */
+angular.module('<%= name %>')
+.filter('trimBadUrl', [ '_', function (_) {
+  // default statement
+  return function (value, filter, replacement) {
+    // data is valid before process ?
+    if (!_.isEmpty(value) && !_.isEmpty(filter)) {
+      // replace
+      return value.replace(filter, replacement || '');
+    }
+
+    // default statement
+    return value;
+  };
+}]);
+
+/**
  * Special filter to remove extra prefix code on iso code. to retreive main country code
  *
  * @param {Object} _ lodash object https://lodash.com/docs
@@ -179,5 +200,19 @@ angular.module('<%= name %>')
   return function (value) {
     // default statement
     return _.isEmpty(value);
+  };
+}]);
+
+/**
+ * Special filter to fixed number of decimal
+ *
+ * @param {Object} _ lodash object https://lodash.com/docs
+ */
+angular.module('<%= name %>')
+.filter('toFixed', [ '_', function (_) {
+  // default statement
+  return function (value, number) {
+  // default statement
+    return _.isUndefined(value) ? 0 : Number(value).toFixed(number);
   };
 }]);

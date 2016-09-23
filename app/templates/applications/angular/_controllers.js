@@ -8,11 +8,12 @@
  * @param {Object} appConstants current applications constants
  * @param {Object} $translate current $translate instance https://angular-translate.github.io/docs/
  * @param {Object} $scope https://docs.angularjs.org/api/ng/type/$rootScope.Scope
+ * @param {Object} moment http://momentjs.com/docs/
  */
 angular.module('<%= name %>')
 .controller('ApplicationController',
-[ '$rootScope', 'logService', 'appConstants', '$translate', '$scope',
-function ($rootScope, logService, appConstants, $translate, $scope) {
+[ '$rootScope', 'logService', 'appConstants', '$translate', '$scope', 'moment'
+function ($rootScope, logService, appConstants, $translate, $scope, moment) {
 
   /****************************************************************
    *               DO NOT REMOVE CODES LINES BELOW
@@ -35,6 +36,8 @@ function ($rootScope, logService, appConstants, $translate, $scope) {
     });
     // change languages assignation
     $scope.languages = languages;
+    // set moment locale
+    moment.locale(appConstants.keys().locale);
   });
 
   // on failed ?

@@ -87,7 +87,7 @@ angular.module('<%= name %>')
         // has requirement
         if (_.isArray(urls) && !_.isEmpty(urls)) {
           // retreive url
-          item = _.find(urls, 'name', key);
+          item = _.find(urls, [ 'name', key ]);
         }
       }
       // default statement
@@ -131,16 +131,17 @@ angular.module('<%= name %>')
      *
      * @param {string} key default key to find
      * @param {Object} rules default rules to map
+     * @param {Boolean} if true add api route false otherwise
      * @return {String|Boolean} url builded or false in case of failure
      */
-    getUrl : function (key, rules) {
+    getUrl : function (key, rules, api) {
       // retreive item
       var item = this.get(key);
 
       // item is valid ?
       if (item) {
         // build url
-        item = this.buildUrl(item.value, rules, item.api);
+        item = this.buildUrl(item.value, rules, _.isUndefined(api) ? item.api : api);
       }
 
       // return invalid statement

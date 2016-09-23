@@ -107,10 +107,11 @@ angular.module('<%= name %>')
     terminal  : true,
     scope     : true,
     compile   : function (tElement, tAttrs) {
+      // is input ?
       if (tElement[0].tagName !== 'INPUT' || !tElement.attr('type', 'checkbox')) {
         throw 'checklist-model should be applied to `input[type="checkbox"]`.';
       }
-
+      // exists ?
       if (!tAttrs.checklistValue) {
         throw 'You should provide `checklist-value`.';
       }

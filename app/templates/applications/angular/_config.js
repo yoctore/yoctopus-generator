@@ -13,6 +13,20 @@ function (localStorageServiceProvider) {
 }]);
 
 /**
+ * Configure the breadcrumb provider
+ *
+ * @param {Object} $breadcrumbProvider https://github.com/ncuillery/angular-breadcrumb/wiki
+ */
+angular.module('<%= name %>')
+.config([ '$breadcrumbProvider',
+function ($breadcrumbProvider) {
+  // Breadcrumb options
+  $breadcrumbProvider.setOptions({
+    templateUrl: 'partials/template/breadcrumb'
+  });
+}]);
+
+/**
  * Allow some ref to compile list. for sms / tel usage
  *
  * @param {Object} $compilteProvider https://docs.angularjs.org/api/ng/provider/$compileProvider
@@ -21,51 +35,6 @@ angular.module('<%= name %>')
 .config([ '$compileProvider', function ($compileProvider) {
   // add list
   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|file|tel|sms):/);
-}]);
-
-/**
- * Tricks For Ng Touch, Prevent the base click envent from ngTouch
- *
- * @param {Object} $provide https://docs.angularjs.org/api/auto/service/$provide
- * @param {Object} $delegate https://docs.angularjs.org/api/auto/service/$provide
- * @param {Object} $parse https://docs.angularjs.org/api/ng/service/$parse
- */
-angular.module('<%= name %>')
-.config([ '$provide', function ($provide) {
- // Create a decoration for ngClickDirective
- $provide.decorator('ngClickDirective', [ '$delegate', '$parse', function ($delegate, $parse) {
-  // Get the original compile function by ngTouch
-  var origValue = $delegate[0].compile();
-
-  // Get set the compiler
-  $delegate[0].compile = compiler;
-
-  //return augmented ngClick
-  return $delegate;
-
-  // Compiler Implementation
-  function compiler(elm, attr) {
-    // Look for "notouch" attribute, if present return regular click event, 
-    // no touch simulation
-    if (angular.isDefined(attr.notouch)) {
-      // get fn
-      var fn = $parse(attr[ 'ngClick' ]);
-      // default statement
-      return function handler(scope, element) {
-        // bind click event
-        element.on('click', function (event) {
-          // apply
-          scope.$apply(function () {
-            // call fn
-            fn(scope, { $event:event });
-          });
-        });
-      }
-    }
-    // return original ngCLick implementation by ngTouch
-    return origValue;
-   }
- }]);
 }]);
 
 /**
@@ -86,10 +55,14 @@ function ($translateProvider, appConstantsProvider) {
   $translateProvider.useLocalStorage();
   // enable cache language
   $translateProvider.useLoaderCache(true);
+  // enable cache language
+  $translateProvider.useLoaderCache(true);
   // enable async refresh
   $translateProvider.forceAsyncReload(true);
+  //translated values will be processed again with AngularJS $compile.
+  $translateProvider.usePostCompiling(true);
   // enable security
-  $translateProvider.useSanitizeValueStrategy('escape');
+  $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
 }]);
 
 /**
