@@ -545,3 +545,125 @@ angular.module('<%= name %>')
     }
   };
 }]);
+
+/**
+ * Mock utility service
+ *
+ * @param {Object} $httpBackend https://docs.angularjs.org/api/ngMock/service/$httpBackend
+ * @param {Object} $http https://docs.angularjs.org/api/ng/service/$http
+ * @param {Object} _ lodash object https://lodash.com/docs
+ * @param {Object} $rootScope https://docs.angularjs.org/api/ng/service/$rootScope
+ */
+angular.module('<%= name %>')
+.service('mockService', [ '$httpBackend', '$http', '_', '$rootScope',
+function ($httpBackend, $http, _, $rootScope) {
+  // default statement
+  return {
+    /**
+     * Default method to mocks another services
+     *
+     * @param {Boolean} activeMock true if the mock service is active
+     */
+    build : function (activeMock) {
+      // mock is active ?
+      if (activeMock) {
+        $http.get('assets/mocks/mocks.json').then(function successCallback (success) {
+          // check if the success.data has expectRoutes
+          if (_.has(success.data, 'expectRoutes')) {
+            // Parse the success.data.expectRoutes to build expect $httpBackend routes
+            _.forEach(success.data.expectRoutes, function (obj) {
+              // Check if the obj.regex is true if it's regexp the obj.url
+              var url = obj.regex ? RegExp(obj.url) :  obj.url;
+              // passTrought the url
+              $httpBackend.when(obj.type, url).passThrough();
+            });
+          }
+          // check if the success.data has routes
+          if (_.has(success.data, 'routes')) {
+            // count the number of route to build
+            var numberRoutes = _.size(success.data.routes);
+            // Init var initNumberRoutes
+            var initNumberRoutes = 0;
+            // Parse success.data.routes to build fake $http routes
+            _.forEach(success.data.routes, function (obj) {
+
+              // Add +1 at initNumberRoutes
+              initNumberRoutes++;
+              // Check if the numberRoutes is equal to initNumberRoutes
+              if (numberRoutes === initNumberRoutes) {
+                // Broadcast the event $routes.build.success
+                $rootScope.$broadcast('$routes.build.success');
+              }
+
+              // Check if the obj.regex is true if it's regexp the obj.url
+              var url = obj.regex ? RegExp(obj.url) :  obj.url;
+              // Check if the obj.params exist if it's not put empty arconray
+              var objParams = obj.params ? obj.params : [];
+
+              // Build fake route
+              $httpBackend.when(obj.type, url, undefined, undefined, objParams).respond(
+                function (method, url, data, headers, params) {
+                  // Init the data to send
+                  var dataSend;
+                  // Check if the params is not empty
+                  if (!_.isEmpty(objParams)) {
+                    // parse all items
+                    _.forEach(params, function (obj, key) {
+                      // is empty ? for delete action
+                      if (_.isEmpty(obj)) {
+                        delete(params[key]);
+                      }
+                    });
+                    // Build the data to send
+                    dataSend = _.get(_.find(_.get(success.data, obj.response), params), 'return');
+                  } else {
+                    // Build the data to send
+                    dataSend = _.get(success.data, obj.response);
+                  }
+                  return [
+                    200, {
+                      status  : 'success',
+                      code    : '200000',
+                      message : [ 'httpBackend', obj.url ].join(' '),
+                      data    : dataSend
+                    },
+                    {}
+                  ];
+                }
+              );
+            });
+          }
+        }, function errorCallback(error) {
+          // DO stuff here ... nothing to do for the moment
+        });
+      } else {
+        // Allow all routes with type GET
+        $httpBackend.whenGET(/(.+)/).passThrough();
+        // Allow all routes with type POST
+        $httpBackend.whenPOST(/(.+)/).passThrough();
+        // Allow all routes with type PATCH
+        $httpBackend.whenPATCH(/(.+)/).passThrough();
+        // Allow all routes with type DELETE
+        $httpBackend.whenDELETE(/(.+)/).passThrough();
+        // Allow all routes with type PUT
+        $httpBackend.whenPUT(/(.+)/).passThrough();
+        // Broadcast the event $routes.build.success
+        $rootScope.$broadcast('$routes.build.success');
+      }
+    },
+    /**
+     * Default method to build default exception routes
+     */
+    buildDefaultRoutes : function () {
+      $httpBackend.whenGET('notFound').passThrough();
+      $httpBackend.whenGET('token/refresh').passThrough();
+      $httpBackend.whenGET(/(.+)\/token\/refresh\//).passThrough();
+      $httpBackend.whenGET('assets/mocks/mocks.json').passThrough();
+      $httpBackend.whenGET('/config').passThrough();
+      $httpBackend.whenPOST('/log/message').passThrough();
+      $httpBackend.whenGET(/^\/partials\//).passThrough();
+      $httpBackend.whenGET(/^\partials\//).passThrough();
+      $httpBackend.whenGET(/^\/config\//).passThrough();
+    }
+  };
+}]);

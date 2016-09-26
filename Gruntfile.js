@@ -18,7 +18,7 @@ module.exports = function (grunt) {
       api     : {
         files : [ {
           expand  : true,
-          cwd     : 'app',
+          cwd     : 'app/node',
           src     : '**/*.js',
           dest    : 'dist'
         } ]

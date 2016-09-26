@@ -36,6 +36,7 @@ appConstants, $interval,localStorageService) {
   // Remove the locaStorage x-jwt-token
   localStorageService.remove('x-jwt-token');
 
+  // define reponsive state
   $rootScope.isMobile   = screenSize.is('xs');
   $rootScope.isTablet   = screenSize.is('sm');
   $rootScope.isDesktop  = screenSize.is('md, lg');
@@ -55,11 +56,13 @@ appConstants, $interval,localStorageService) {
 
   // catch reload action
   angular.element($window).bind('beforeunload', function (event) {
+    // broadast reload window event
     $rootScope.$broadcast('$reload.window', event);
   });
 
   // detect scroll on page
   angular.element($window).bind('scroll', function (event) {
+    // broadcast scroll page event
     $rootScope.$broadcast('$page.scroll', event);
   });
 

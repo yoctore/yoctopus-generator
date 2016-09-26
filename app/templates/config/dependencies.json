@@ -7,7 +7,9 @@
       "fs-extra",
       "yocto-utils",
       "sitemap",
-      "glob"
+      "glob",
+      "request",
+      "request-ip"
     ],
     "devDependencies" : [
       "grunt",
