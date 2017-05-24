@@ -63,29 +63,8 @@ module.exports = generators.Base.extend({
         grunt         : [ this.sourceRoot(), 'config/gruntfile.json' ].join('/')
       },
       generate    : {
-        node            : false,
-        angular         : false,
-        api             : false,
-        module          : false
-      },
-      generateConfig : {
-        node    : {
-          templates  : [ {
-            source      : '_package.json',
-            destination : 'package.json'
-          } ],
-          name      : 'NodeJs'
-        },
-        angular : {
-          templates  : [ {
-            source      : '_bower.json',
-            destination : 'bower.json'
-          }, {
-            source      : '_package.json',
-            destination : 'package.json'
-          } ],
-          name      : 'AngularJs'
-        }
+        node    : false,
+        angular : false
       },
       codes       : {
         eManual   : 500,
@@ -357,7 +336,7 @@ module.exports = generators.Base.extend({
       this.info('Retreive grunt config succeed.');
       // message
       this.warning([ 'Try to connect on', this.cfg.angular.url,
-                     'to retreive available angular versions' ].join(' '));
+                     'to retreive angular available versions' ].join(' '));
       // start spinner
       this.spinner.start();
       // process request
@@ -404,13 +383,9 @@ module.exports = generators.Base.extend({
       var done = this.async();
 
       // define app choises
-      var appChoices = [
-        { name : 'A new web application based on NodeJs', value : 'node' },
-        { name : 'A new web application based on AngularJs', value : 'angular' },
-        { name : 'A new web application based on NodeJs & AngularJs', value : 'nodeangular' },
-        { name : 'A new API application', value : 'api' },
-        { name : 'A new open source module', value : 'module' }
-      ];
+      var appChoices = [ 'An application only based on NodeJs',
+                         'An application only based on AngularJs',
+                         'An application based on NodeJs & AngularJs' ];
       // prompt message
       this.prompt([ {
         name    : 'typeApp',
@@ -418,13 +393,12 @@ module.exports = generators.Base.extend({
         type    : 'list',
         choices : appChoices
       }], function (props) {
-        // set correct state before generate app
-        this.cfg.generate.node        = props.typeApp === 'node' ||
-                                        props.typeApp === 'nodeangular';
-        this.cfg.generate.angular     = props.typeApp === 'angular' ||
-                                        props.typeApp === 'nodeangular';
-        this.cfg.generate.api         = props.typeApp === 'api';
-        this.cfg.generate.module      = props.typeApp === 'module';
+        // generate node app state
+        this.cfg.generate.node    = (props.typeApp === _.first(appChoices) ||
+                                     props.typeApp === _.last(appChoices));
+        // generate node app state
+        this.cfg.generate.angular = (props.typeApp === _.last(appChoices) ||
+                                     props.typeApp === appChoices[1]);
         // end process
         done();
       }.bind(this));
@@ -513,7 +487,7 @@ module.exports = generators.Base.extend({
         {
           name        : 'private',
           type        : 'confirm',
-          default     : this.cfg.opensource === false,
+          default     : this.cfg.opensource === true,
           message     : 'Your application is private ?',
         },
         {
@@ -640,7 +614,6 @@ module.exports = generators.Base.extend({
         {
           name        : 'private',
           type        : 'confirm',
-          default     : this.cfg.opensource === false,
           message     : 'Your application is private ?'
         },
         {
@@ -673,7 +646,7 @@ module.exports = generators.Base.extend({
           }
         } ]);
 
-        // if node app is not defined add default prompt data
+        // si node app is not defined add default prompt data
         if (!this.cfg.generate.node) {
           // parse all item
           _.each(defaultObj, function (obj) {
@@ -875,7 +848,7 @@ module.exports = generators.Base.extend({
         // prompt list
         var prompt = [];
 
-        // generate extra node dep ?
+        // generate node ?
         if (this.cfg.generate.node && !_.isEmpty(this.dependencies.extra.node[type])) {
           // add in prompt dependencies
           prompt.push({
@@ -886,7 +859,7 @@ module.exports = generators.Base.extend({
             choices : this.dependencies.extra.node[type]
           });
         }
-        // generate extra angular dep ?
+        // generate angular ?
         if (this.cfg.generate.angular && !_.isEmpty(this.dependencies.extra.angular[type])) {
           // add in prompt dependencies
           prompt.push({
@@ -1003,81 +976,91 @@ module.exports = generators.Base.extend({
       // create async process
       var done = this.async();
 
-      // par sella available modules
-      async.eachSeries(_.keys(this.cfg.generate), function (type, next) {
+      // to execute
+      async.eachSeries([ 'node', 'angular' ], function (type, next) {
+
+        // default config auto process
+        var config = {
+          node    : {
+            template  : {
+              source      : '_package.json',
+              destination : 'package.json'
+            },
+            name      : 'NodeJs'
+          },
+          angular : {
+            template  : {
+              source      : '_bower.json',
+              destination : 'bower.json'
+            },
+            name      : 'AngularJs'
+          },
+        };
+
         // find type
-        var current = this.cfg.generateConfig[type];
+        var current = config[type];
 
         // is undefined ?
         if (!_.isUndefined(current)) {
           // generate node ?
           if (this.cfg.generate[type]) {
-            // parse all template to build
-            async.eachSeries(current.templates, function (template, tnext) {
-              // banner message
-              this.banner([ 'We will build your', template.destination,
-                            'for your', current.name, 'configuration' ].join(' '));
+            // banner message
+            this.banner([ 'We will build your',current.template.destination,
+                          'for your', current.name, 'configuration' ].join(' '));
 
-              // start spinner
-              this.spinner.start();
-              // file exists ?
-              fs.stat(this.prefixPath(template.destination), function (err) {
-                if (err) {
-                  // write file
-                  fs.writeJson(this.prefixPath(template.destination), this[type],
-                  function (err) {
-                    // has no error ?
-                    if (!err) {
-                      // start a timeout here
-                      var timeout = setTimeout(function () {
-                        // stop spinner
-                        this.spinner.stop(true);
-                        // clear timeout
-                        clearTimeout(timeout);
-                        // success message
-                        this.info([ 'File', template.destination,
-                                    'was correctly created & builded.' ].join(' '));
-                        // next process
-                        tnext();
-                      }.bind(this), this.cfg.delay);
-                    } else {
+            // start spinner
+            this.spinner.start();
+            // file exists ?
+            fs.stat(this.prefixPath(current.template.destination), function (err) {
+              if (err) {
+                // write file
+                fs.writeJson(this.prefixPath(current.template.destination), this[type],
+                function (err) {
+                  // need to force generation on package.json on angular only type
+                  if (type === 'angular') {
+                    // write
+                    fs.writeJson(this.prefixPath('package.json'), this[type]);
+                  }
+                  // has no error ?
+                  if (!err) {
+                    // start a timeout here
+                    var timeout = setTimeout(function () {
+                      // stop spinner
+                      this.spinner.stop(true);
+                      // clear timeout
+                      clearTimeout(timeout);
                       // success message
-                      this.error([ 'Cannot create', template.destination,
-                                  'file :', err ].join(' '));
-                      // exit cannot continue
-                      process.exit(this.cfg.codes.fFailed);
-                    }
-                  }.bind(this));
-                } else {
-                  // start a timeout here
-                  var timeout = setTimeout(function () {
-                    // stop spinner
-                    this.spinner.stop(true);
-                    // clear timeout
-                    clearTimeout(timeout);
-                    // has node activated ?
-                    if (this.cfg.generate.node && this.cfg.generate.angular) {
-                      // warning message
-                      this.warning([ [ 'Cannot create & build file',
-                                     template.destination ].join(' '),
-                                     '. This file was previously builded. Skip it.'
-                                   ].join(''))
-                    } else {
-                      // error message
-                      this.error([ [ 'Cannot create & build file',
-                                     template.destination ].join(' '),
-                                     '. this file must be remove first'
-                                   ].join('')
-                                );
-                    }
-                    // next process
-                    tnext();
-                  }.bind(this), this.cfg.delay);
-                }
-              }.bind(this));
-            }.bind(this), function () {
-              next();
-            });
+                      this.info([ 'File', current.template.destination,
+                                  'was correctly created & builded.' ].join(' '));
+                      // next process
+                      next();
+                    }.bind(this), this.cfg.delay);
+                  } else {
+                    // success message
+                    this.error([ 'Cannot create', current.template.destination,
+                                'file :', err ].join(' '));
+                    // exit cannot continue
+                    process.exit(this.cfg.codes.fFailed);
+                  }
+                }.bind(this));
+              } else {
+                // start a timeout here
+                var timeout = setTimeout(function () {
+                  // stop spinner
+                  this.spinner.stop(true);
+                  // clear timeout
+                  clearTimeout(timeout);
+                  // error message
+                  this.error([ [ 'Cannot create & build file',
+                                 current.template.destination ].join(' '),
+                                 '. this file must be remove first'
+                               ].join('')
+                            );
+                  // next process
+                  next();
+                }.bind(this), this.cfg.delay);
+              }
+            }.bind(this));
           } else {
             // next process
             next();
@@ -1100,9 +1083,15 @@ module.exports = generators.Base.extend({
       var done = this.async();
 
       // to execute
-      async.eachSeries(_.keys(this.cfg.generate), function (type, next) {
+      async.eachSeries([ 'node', 'angular' ], function (type, next) {
+
+        // default config auto process
+        var config = { node     : { name : 'NodeJs' },
+                       angular  : { name : 'AngularJs' }
+                     };
+
         // find type
-        var current = this.cfg.generateConfig[type];
+        var current = config[type];
 
         // is undefined ?
         if (!_.isUndefined(current)) {
